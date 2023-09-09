@@ -2197,7 +2197,8 @@ void PlayLoop(void)
 	{
 		US_InitRndT(true);
 	}
-	TimeCount = lasttimecount = tics = 3;
+	SDL_ResetTimeCount(3);
+	lasttimecount = tics = 3;
 
 	do
 	{

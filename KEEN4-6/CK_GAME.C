@@ -420,7 +420,7 @@ void FadeAndUnhook(void)
 	{
 		VW_FadeIn();
 		RF_SetRefreshHook(NULL);
-		TimeCount = lasttimecount;	// don't adaptively time the fade
+		SDL_ResetTimeCount(lasttimecount);	// don't adaptively time the fade
 	}
 }
 

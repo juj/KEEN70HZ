@@ -23,6 +23,7 @@
 // ID_VW.C
 
 #include "ID_HEADS.H"
+#include "BENCHVS.H"
 
 /*
 =============================================================================
@@ -103,6 +104,127 @@ unsigned	cursorspot;
 */
 
 static	char *ParmStrings[] = {"HIDDENCARD","NOPAN",""};
+
+// JukkaJ: VW_ApplyScreenScroll() programs the CRTC scroll registers with
+//         previously set scroll values from VW_SetScreenDelayed(). Caller must
+//         ensure when calling this function that we are currently synchronized
+//         to vertical blank and that interrupts are disabled.
+static unsigned int pending_crtc;
+static unsigned char pending_pel;
+static void ApplyScreenScroll()
+{
+//asm cli // Caller needs to ensure interrupts are disabled!
+	asm mov dx, 3D4h
+	asm mov ax, [pending_crtc]
+	asm mov bh, al
+	asm mov al, 0Ch
+	asm out dx, ax
+	asm inc al
+	asm mov ah, bh
+	asm out dx, ax
+	asm mov dx, 3DAh
+	asm in al, dx
+	asm mov al, 33h
+	asm mov dx, 3C0h
+	asm out dx, al
+	asm mov al, [pending_pel]
+	asm out dx, al
+//asm sti
+}
+
+// JukkaJ: This function marks the new display scroll parameters that should be
+//         applied the next time when synchronizing to vertical blank. Use this
+//         function when scrolling needs to be smooth.
+void VW_SetScreenDelayed(unsigned int crtc, unsigned int pel)
+{
+	pending_crtc = crtc;
+	pending_pel = pel;
+}
+
+// JukkaJ: This function immediately reprograms the screen scroll registers.
+//         Use this when no smooth transition is needed, e.g. entering or
+//         exiting game menus.
+void VW_SetScreen(unsigned int crtc, unsigned int pel)
+{
+	VW_SetScreenDelayed(crtc, pel);
+	disable();
+	ApplyScreenScroll();
+	enable();
+}
+
+static void WaitVBLCrtTerminator(int number)
+{
+	if (number > 1) // If more than one blank to wait, we can leisurely skip
+	{               // through the extras without needing to disable interrupts.
+		unsigned char fc = inp(0x126) - 1;
+		while((unsigned char)(inp(0x126) - fc) < number) ;
+	}
+	// Only one blank to wait left.
+	asm mov dx, 127h // Port 127h: CRT Terminator "Scanlines left until vblank"
+wait_vblank_end: // If we are currently in vblank, we are too late to safely
+	asm in al, dx  // synchronize to this one, and must let it pass.
+	asm test al, al
+	asm jz wait_vblank_end
+
+leisurely_wait_scanlines: // If we have lots of scanlines left until vblank,
+	asm in al, dx           // we can burn past them without interrupts disabled.
+	asm test al, 0FCh
+	asm jnz leisurely_wait_scanlines
+
+	asm cli // Now only few scanlines until vblank start, disable interrupts.
+	asm dec dl // Port 126h: CRT Terminator "combined frame/vblank counter"
+	asm in al, dx
+	asm mov ah, al
+
+wait_until_vblank_start:
+	asm in al, dx
+	asm xor al, ah
+	asm jz wait_until_vblank_start // Loop until frame changes (vblank is entered)
+	// Now we are at start of vblank, this is the perfect moment to reprogram
+	// both VGA hardware scroll registers.
+	ApplyScreenScroll();
+	SDL_UpdateTime(); // And also ensure we have latest game time
+	asm sti
+
+}
+
+static void WaitVBLVGA(int number)
+{
+	int i;
+	while(number-- > 0)
+	{
+		long time_start = TimeCount;
+		disable();
+wait_for_active_picture:
+		while (inp(0x3DA) & 1) /*nop*/;  // Skip blank regions, i.e. wait until we are in visible picture area
+
+wait_for_hblank:
+		enable(); // Let interrupts run so that TimeCount advances.
+		if (TimeCount - time_start >= 3) break; // we've restarted the wait too many times, give up on waiting
+		disable();
+
+		for(i = 0; i < MaxHblankLength; ++i)
+		{
+			unsigned char status = inportb(0x3DA);
+			if (status & 8) goto wait_for_active_picture; // if we make it to vsync, restart wait from scratch
+			if (!(status & 1)) goto wait_for_hblank; // if we are in visible picture, restart wait
+		}
+
+		// If we get here, we have transitioned from visible image to a blank that is at least 15 VGA I/O port
+		// read operations long. We conclude we must have now entered a vblank.
+		ApplyScreenScroll();
+		SDL_AlignPreciseTimeCount();
+		enable();
+	}
+}
+
+// JukkaJ: Waits for the given number of vblanks to pass, and while at it,
+//         reprograms the hardware scroll registers in a synchronized manner.
+void VW_WaitVBL(int number)
+{
+	if (SupportsCrtTerminator) WaitVBLCrtTerminator(number);
+	else WaitVBLVGA(number);
+}
 
 void	VW_Startup (void)
 {
@@ -220,6 +342,7 @@ void VW_SetScreenMode (int grmode)
 #endif
 	}
 	VW_SetLineWidth(SCREENWIDTH);
+	if (grmode != TEXTGR) BenchmarkVideoRefreshRate();
 }
 
 /*

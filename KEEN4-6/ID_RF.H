@@ -36,7 +36,7 @@
 =============================================================================
 */
 
-#define	MINTICS				2
+#define	MINTICS				1
 #define	MAXTICS				5
 #define DEMOTICS			3
 

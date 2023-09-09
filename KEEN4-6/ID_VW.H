@@ -260,6 +260,7 @@ cardtype	VW_VideoID (void);
 void 	VW_SetLineWidth(int width);
 void 	VW_SetSplitScreen(int width);
 void 	VW_SetScreen (unsigned CRTC, unsigned pelpan);
+void 	VW_SetScreenDelayed (unsigned CRTC, unsigned pelpan);
 
 void	VW_SetScreenMode (int grmode);
 void	VW_ClearVideo (int color);

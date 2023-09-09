@@ -524,9 +524,15 @@ nextline:
 		}
 
 		//
-		// page flip
+		// page flip and handle timing
+		// This needs to scroll smoothly, so use delayed SetScreen.
 		//
-		VW_SetScreen(pageofs + x / 8, x & 7);
+		VW_SetScreenDelayed(pageofs + x / 8, x & 7);
+		VW_WaitVBL(1);
+		now = TimeCount;
+		tics = now-lasttimecount;
+		lasttimecount = now;
+
 		pageon ^= 1;
 		if (pageon)
 		{
@@ -536,16 +542,6 @@ nextline:
 		{
 			pageofs = 0;
 		}
-
-		//
-		// handle timing
-		//
-		do
-		{
-			now = TimeCount;
-			tics = now - lasttimecount;
-		} while (tics < 2);
-		lasttimecount = now;
 
 		//
 		// handle input
@@ -1803,7 +1799,8 @@ void ScrollSWText(void)
 	Uint16 pos;
 	Sint16 i, rowof;
 
-	tics = TimeCount = lasttimecount = 0;
+	tics = lasttimecount = 0;
+	SDL_ResetTimeCount(0);
 
 	EGAWRITEMODE(0);
 	EGAMAPMASK(8);	// only draw to the "intensity" plane (so we don't erase the backgound pic)

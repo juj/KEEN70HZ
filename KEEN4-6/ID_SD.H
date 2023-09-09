@@ -183,9 +183,12 @@ extern	SDMode		SoundMode;
 extern	SMMode		MusicMode;
 extern	longword	TimeCount;					// Global time in ticks
 
+extern boolean SupportsCrtTerminator;
+
 // Function prototypes
 extern	void	SD_Startup(void),
 				SD_Shutdown(void),
+				SDL_UpdateTime(void),
 				SD_Default(boolean gotit,SDMode sd,SMMode sm),
 				SD_PlaySound(soundnames sound),
 				SD_StopSound(void),

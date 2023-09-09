@@ -261,6 +261,7 @@ void RFL_UpdateSprites (void);
 =====================
 */
 
+extern boolean pan1px;
 static	char *ParmStrings[] = {"comp",""};
 
 void RF_Startup (void)
@@ -315,7 +316,7 @@ void RF_Startup (void)
 			for (x=0;x<UPDATEWIDE;x++)
 				*blockstart++ = SCREENWIDTH*16*y+x*TILEWIDTH;
 
-		xpanmask = 6;	// dont pan to odd pixels
+		xpanmask = pan1px ? 7 : 6;	// pan to odd pixels only if pan1px is enabled
 	}
 
 	else if (grmode == CGAGR)
@@ -1545,15 +1546,17 @@ void RF_RedrawBlock (int x, int y, int width, int height)
 =====================
 */
 
+extern boolean fullframerate;
+
 void RF_CalcTics (void)
 {
-	long	newtime,oldtimecount;
+	long	newtime,oldtimecount, target_wait;
 
 //
 // calculate tics since last refresh for adaptive timing
 //
 	if (lasttimecount > TimeCount)
-		TimeCount = lasttimecount;		// if the game was paused a LONG time
+		SDL_ResetTimeCount(lasttimecount);		// if the game was paused a LONG time
 
 	if (DemoMode)					// demo recording and playback needs
 	{								// to be constant
@@ -1561,10 +1564,10 @@ void RF_CalcTics (void)
 // take DEMOTICS or more tics, and modify Timecount to reflect time taken
 //
 		oldtimecount = lasttimecount;
-		while (TimeCount<oldtimecount+DEMOTICS*2)
-		;
+		newtime = oldtimecount+DEMOTICS*2 - TimeCount;
+		if (newtime > 0) VW_WaitVBL(newtime);
 		lasttimecount = oldtimecount + DEMOTICS;
-		TimeCount = lasttimecount + DEMOTICS;
+		SDL_ResetTimeCount(lasttimecount + DEMOTICS);
 		tics = DEMOTICS;
 	}
 	else
@@ -1572,11 +1575,14 @@ void RF_CalcTics (void)
 //
 // non demo, so report actual time
 //
-		do
-		{
-			newtime = TimeCount;
-			tics = newtime-lasttimecount;
-		} while (tics<MINTICS);
+		int numFramesToWait = fullframerate?MINTICS:MINTICS+1;
+		newtime = TimeCount;
+		target_wait = lasttimecount + numFramesToWait - newtime;
+		if (target_wait < 1) target_wait = 1;
+		else if (target_wait > numFramesToWait) target_wait = numFramesToWait;
+		VW_WaitVBL(target_wait);
+		newtime = TimeCount;
+		tics = newtime-lasttimecount;
 		lasttimecount = newtime;
 
 #ifdef PROFILE
@@ -1589,7 +1595,8 @@ void RF_CalcTics (void)
 
 		if (tics>MAXTICS)
 		{
-			TimeCount -= (tics-MAXTICS);
+			lasttimecount -= (tics-MAXTICS);
+			SDL_ResetTimeCount(lasttimecount);
 			tics = MAXTICS;
 		}
 	}
@@ -2312,8 +2319,11 @@ void RF_Refresh (void)
 
 //
 // display the changed screen
+// JukkaJ: This call performs the smooth pixel-by-pixel scrolling, and is not
+// a camera reset. So this change needs to occur delayed to be smoothly
+// synchronized to vertical refresh.
 //
-	VW_SetScreen(bufferofs+panadjust,panx & xpanmask);
+	VW_SetScreenDelayed(bufferofs+panadjust,panx & xpanmask);
 
 //
 // prepare for next refresh

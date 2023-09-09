@@ -51,6 +51,8 @@
 
 #include <dos.h>
 
+#include "BENCHVS.H"
+
 #ifdef	_MUSE_      // Will be defined in ID_Types.h
 #include "ID_SD.h"
 #else
@@ -750,6 +752,48 @@ here:
 //		dispatches to whatever other routines are appropriate
 //
 ///////////////////////////////////////////////////////////////////////////
+
+boolean SupportsCrtTerminator = 0;
+static unsigned char PrevFrame = 0;
+static long PreciseTimeCount = 0; // Only used if locked at 70 Hz
+
+void SDL_UpdateTime()
+{
+	if (VideoRefreshRateIs70Hz && SupportsCrtTerminator)
+	{
+		unsigned char frame = inp(0x126), delta = frame - PrevFrame;
+		LocalTime += delta;
+		TimeCount += delta;
+		PrevFrame = frame;
+	}
+	else
+	{
+		++PreciseTimeCount;
+		LocalTime = TimeCount = (MusicMode == smm_AdLib)
+		                      ? (PreciseTimeCount + 4) >> 3
+		                      : (PreciseTimeCount + 1) >> 1;
+	}
+}
+
+// Must be called with interrupts disabled
+void SDL_AlignPreciseTimeCount()
+{
+	if (VideoRefreshRateIs70Hz) // If refresh rate is 60 Hz, can't lock to vsync
+	{
+		PreciseTimeCount = (MusicMode == smm_AdLib)
+		                 ? (PreciseTimeCount + 4) & -8ul
+		                 : (PreciseTimeCount + 1) & -2ul;
+	}
+}
+
+void SDL_ResetTimeCount(long newTimeCount)
+{
+	disable();
+	TimeCount = newTimeCount;
+	PreciseTimeCount = TimeCount << (MusicMode == smm_AdLib ? 3 : 1);
+	enable();
+}
+
 static void interrupt
 SDL_t0Service(void)
 {
@@ -767,13 +811,13 @@ asm	out	dx,al
 
 	HackCount++;
 
+	SDL_UpdateTime();
+
 	if (MusicMode == smm_AdLib)
 	{
 		SDL_ALService();
 		if (!(++count & 7))
 		{
-			LocalTime++;
-			TimeCount++;
 			if (SoundUserHook)
 				SoundUserHook();
 		}
@@ -794,8 +838,6 @@ asm	out	dx,al
 	{
 		if (!(++count & 1))
 		{
-			LocalTime++;
-			TimeCount++;
 			if (SoundUserHook)
 				SoundUserHook();
 		}
@@ -882,7 +924,7 @@ SDL_StartDevice(void)
 	SoundNumber = SoundPriority = 0;
 }
 
-static void
+void
 SDL_SetTimerSpeed(void)
 {
 	word	rate;
@@ -990,6 +1032,25 @@ SD_SetMusicMode(SMMode mode)
 	return(result);
 }
 
+static void DetectCrtTerminator()
+{
+	int i;
+	disable();
+	SupportsCrtTerminator = 1;
+	// CRT Terminator ID port: a read-only port that cycles to return
+	// values 'C', 'R', 'T', 'T' on subsequent reads.
+	for(i = 0; i < 4; ++i) // one of 4 consecutive reads must be a 'C'
+	{
+		int x = inp(0x120);
+		if (x == 'C') break;
+		if (x != 'R' && x != 'T') SupportsCrtTerminator = 0; // Got anything else? Can't be CRTT
+	}
+	if (inp(0x120) != 'R') SupportsCrtTerminator = 0;
+	if (inp(0x120) != 'T') SupportsCrtTerminator = 0;
+	if (inp(0x120) != 'T') SupportsCrtTerminator = 0;
+	enable();
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SD_Startup() - starts up the Sound Mgr
@@ -1006,6 +1067,8 @@ SD_Startup(void)
 
 	if (SD_Started)
 		return;
+
+	DetectCrtTerminator();
 
 	ssIsTandy = false;
 	alNoCheck = false;
@@ -1032,7 +1095,7 @@ SD_Startup(void)
 	//SDL_InitDelay();			// SDL_InitDelay() uses t0OldService
 
 	setvect(8,SDL_t0Service);	// Set to my timer 0 ISR
-	LocalTime = TimeCount = alTimeCount = 0;
+	LocalTime = PreciseTimeCount = TimeCount = alTimeCount = 0;
 
 	SD_SetSoundMode(sdm_Off);
 	SD_SetMusicMode(smm_Off);

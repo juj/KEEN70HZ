@@ -45,7 +45,7 @@ boolean tedlevel;
 Uint16 tedlevelnum;
 
 char str[80], str2[20];
-boolean storedemo, jerk;
+boolean storedemo, fullframerate, pan1px;
 
 /*
 =============================================================================
@@ -131,7 +131,8 @@ void ShutdownId(void)
 
 void InitGame(void)
 {
-	static char *ParmStrings[] = {"JERK", ""};
+// JukkaJ: currently unused.
+//	static char *ParmStrings[] = {"JERK", ""};
 	void MML_UseSpace (Uint16 segstart, Uint16 seglength);
 
 	Uint16 segstart,seglength;
@@ -142,7 +143,8 @@ void InitGame(void)
 	// JERK parameter has absolutely no effect if a valid config file
 	// exists. The parameter check should be moved to some place after
 	// US_Startup to make it work reliably.
-	
+// JukkaJ: currently unused.
+/*
 	for (i=1; i < _argc; i++)
 	{
 		if (US_CheckParm(_argv[i], ParmStrings) == 0)
@@ -150,6 +152,7 @@ void InitGame(void)
 			jerk = true;
 		}
 	}
+*/
 
 	US_TextScreen();
 

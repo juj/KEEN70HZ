@@ -192,9 +192,7 @@ void TimedPicCommand(void)
 //
 // wait for time
 //
-	TimeCount = 0;
-	while (picdelay > TimeCount)
-	;
+	if (picdelay > 0) VW_WaitVBL(picdelay);
 
 //
 // draw pic

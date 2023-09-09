@@ -58,7 +58,7 @@
 //      Special imports
 extern  boolean         showscorebox;
 #ifdef  KEEN
-extern	boolean		jerk;
+extern	boolean		fullframerate, pan1px;
 extern  boolean         oldshooting;
 extern  ScanCode        firescan;
 #else
@@ -243,6 +243,8 @@ US_SetLoadSaveHooks(boolean (*load)(int),boolean (*save)(int),void (*reset)(void
 	USL_ResetGame = reset;
 }
 
+extern unsigned xpanmask;
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //      USL_ReadConfig() - Reads the configuration file, if present, and sets
@@ -279,7 +281,9 @@ USL_ReadConfig(void)
 		read(file,&compatability,sizeof(compatability));
 		read(file,&QuietFX,sizeof(QuietFX));
 		read(file,&hadAdLib,sizeof(hadAdLib));
-		read(file,&jerk,sizeof(jerk));
+		read(file,&fullframerate,sizeof(fullframerate));
+		read(file,&pan1px,sizeof(pan1px));
+		xpanmask = pan1px ? 7 : 6;	// pan to odd pixels only if pan1px is enabled
 #ifdef KEEN
 		read(file,&oldshooting,sizeof(oldshooting));
 		read(file,&firescan,sizeof(firescan));
@@ -346,7 +350,8 @@ USL_WriteConfig(void)
 		write(file,&compatability,sizeof(compatability));
 		write(file,&QuietFX,sizeof(QuietFX));
 		write(file,&AdLibPresent,sizeof(AdLibPresent));
-		write(file,&jerk,sizeof(jerk));
+		write(file,&fullframerate,sizeof(fullframerate));
+		write(file,&pan1px,sizeof(pan1px));
 #ifdef KEEN
 		write(file,&oldshooting,sizeof(oldshooting));
 		write(file,&firescan,sizeof(firescan));

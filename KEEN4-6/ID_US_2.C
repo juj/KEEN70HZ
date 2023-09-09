@@ -36,7 +36,7 @@
 //      Special imports
 extern  boolean         showscorebox;
 #ifdef  KEEN
-extern	boolean		jerk;
+extern	boolean		fullframerate, pan1px;
 extern  boolean         oldshooting;
 extern  ScanCode        firescan;
 void	USL_CheckSavedGames(void);
@@ -183,6 +183,7 @@ static  boolean USL_ConfigCustom(UserCall call,struct UserItem far *item),
 				USL_ScoreCustom(UserCall call,struct UserItem far *item),
 				USL_CompCustom(UserCall call,struct UserItem far *item),
 				USL_SmoothCustom(UserCall call,struct UserItem far *item),
+				USL_Pan1PxCustom(UserCall call,struct UserItem far *item),
 #ifdef KEEN
 				USL_TwoCustom(UserCall call,struct UserItem far *item),
 #endif
@@ -257,8 +258,9 @@ static  boolean USL_ConfigCustom(UserCall call,struct UserItem far *item),
 #ifdef KEEN
 	UserItemGroup   far twogroup = {0,0,0,sc_None,0,USL_TwoCustom};
 #endif
-#if GRMODE != CGAGR
 	UserItemGroup   far smoothgroup = {0,0,0,sc_None,0,USL_SmoothCustom};
+#if GRMODE != CGAGR
+	UserItemGroup   far pan1pxgroup = {0,0,0,sc_None,0,USL_Pan1PxCustom};
 	UserItemGroup   far compgroup = {0,0,0,sc_None,0,USL_CompCustom};
 #endif
 
@@ -268,8 +270,9 @@ static  boolean USL_ConfigCustom(UserCall call,struct UserItem far *item),
 #ifdef KEEN
 		{DefFolder(sc_T,"",&twogroup)},
 #endif
+		{DefFolder(sc_F,"",&smoothgroup)},
 #if GRMODE != CGAGR
-		{DefFolder(sc_M,"",&smoothgroup)},
+		{DefFolder(sc_P,"",&pan1pxgroup)},
 		{DefFolder(sc_C,"",&compgroup)},
 #endif
 		{uii_Bad}
@@ -729,9 +732,10 @@ USL_SetOptionsText(void)
 {
 	optionsi[0].text = showscorebox? "SCORE BOX (ON)" : "SCORE BOX (OFF)";
 	optionsi[1].text = oldshooting? "TWO-BUTTON FIRING (ON)" : "TWO-BUTTON FIRING (OFF)";
+	optionsi[2].text = fullframerate? "FULL FRAME RATE (ON)" : "FULL FRAME RATE (OFF)";
 #if GRMODE != CGAGR
-	optionsi[2].text = jerk? "FIX JERKY MOTION (ON)" : "FIX JERKY MOTION (OFF)";
-	optionsi[3].text = compatability? "SVGA COMPATIBILITY (ON)" : "SVGA COMPATIBILITY (OFF)";
+	optionsi[3].text = pan1px? "1 PIXEL PANNING (ON)" : "1 PIXEL PANNING (OFF)";
+	optionsi[4].text = compatability? "SVGA COMPATIBILITY (ON)" : "SVGA COMPATIBILITY (OFF)";
 #endif
 
 	keybi[2].flags &= ~ui_Disabled;
@@ -767,8 +771,25 @@ USL_SmoothCustom(UserCall call,UserItem far *item)
 	if (call != uic_SetupCard)
 		return(false);
 
-	jerk ^= true;
-	USL_CtlDialog(jerk? "Jerky motion fix enabled" : "Jerky motion fix disabled",
+	fullframerate ^= true;
+	USL_CtlDialog(fullframerate? "Full frames (70fps) enabled" : "Cinematic 35fps enabled",
+					"Press any key",nil);
+	USL_SetOptionsText();
+	return(true);
+}
+
+extern unsigned	xpanmask;
+
+#pragma argsused
+static boolean
+USL_Pan1PxCustom(UserCall call,UserItem far *item)
+{
+	if (call != uic_SetupCard)
+		return(false);
+
+	pan1px ^= true;
+	xpanmask = pan1px ? 7 : 6;	// pan to odd pixels only if pan1px is enabled
+	USL_CtlDialog(pan1px? "1-Pixel panning enabled" : "2-Pixel panning enabled",
 					"Press any key",nil);
 	USL_SetOptionsText();
 	return(true);
