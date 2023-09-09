@@ -1,0 +1,16 @@
+ck1patch.pas
+ck2patch.pas
+ck3patch.pas
+ck4patch.pas
+ck5patch.pas
+ck6patch.pas
+ckxpatch.inc
+loader.pas
+parser.pas
+patcher.pas
+misc.pas
+redir.asm
+makefile
+distsrc.lst
+distdoc.lst
+distexec.lst

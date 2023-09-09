@@ -1,0 +1,200 @@
+  ____ _  ______       _       _
+ / ___| |/ /  _ \ __ _| |_ ___| |__
+| |   | ' /| |_) / _` | __/ __| '_ \
+| |___| . \|  __/ (_| | || (__| | | |
+ \____|_|\_\_|   \__,_|\__\___|_| |_|
+
+-----------------------------------------------------------------------
+
+CKPatch v0.11.3 beta
+Copyright (C) 2001-2003 Bryan Rodgers <rodgersb@ses.curtin.edu.au>
+Copyright (C) 2007 Andrew Durdin <me@andy.durdin.net>
+Released to the public under GNU GPL
+
+FREQUENTLY ASKED QUESTIONS (FAQ.TXT)
+
+-----------------------------------------------------------------------
+
+*** TABLE OF CONTENTS ***
+
+[ABOUT] About this FAQ
+
+[Q1] How do I install CKPatch?
+[Q2] How do I distribute my custom levels?
+[Q3] Why doesn't CKPatch recognise my Keen executable?
+[Q4] I patch a string using %patch, but it has garbage after it
+[Q5] Can CKPatch be adapted for other games?
+[Q6] CKPatch is now GPL; can I write a closed-source front-end?
+[Q7] I found a bug in CKPatch! What should I do?
+
+-----------------------------------------------------------------------
+
+[ABOUT] About this FAQ
+
+This is an attempt to answer any common questions that may get asked
+by users of CKPatch.  Like the rest of CKPatch, this document is
+always open to contributions from others who want to share their
+experience and expertise with CKPatch.  If you want to contribute or
+amend questions and/or answers to this FAQ, feel free to email your
+contributions to <rodgersb@ses.curtin.edu.au>.
+
+-----------------------------------------------------------------------
+
+[Q1] How do I install CKPatch?
+
+Simply unpack the zipfile and copy each CKxPATCH.EXE executable to
+its corresponding Commander Keen episode directory.  Unlike previous
+versions of CKPatch, you no longer need to use UNLZEXE to decompress
+your game executable.
+
+-----------------------------------------------------------------------
+
+[Q2] How do I distribute my custom levels?
+
+Section 4.1 in CKPATCH.TXT provides a more in-depth discussion on
+how to do this, so I'll summarise the main points here.
+
+First of all, create a subdirectory and give the subdirectory a name
+that describes your level pack.  Place all the level files inside
+this subdirectory.
+
+Create a text file inside this subdirectory called PATCH.PAT.  For
+levels that work with Keen episodes 1-3, put the following lines in
+PATCH.PAT (substitute ck1 with your episode extension):
+
+%ext ck1
+# These tell CKPatch how to map your level files to game levels.
+# You'll need to specify a %level.file command for each of your
+# level files; two levels are mapped here in this example.
+%level.file 1 mylvl01.ck1
+%level.file 2 mylvl02.ck1
+%end
+
+For levels that work with Keen episodes 4-6, put the following lines in
+PATCH.PAT (substitute ck4 with your episode extension):
+
+%ext ck4
+# Replace custmaps.ck4 with your own custom GAMEMAPS.CKx file that
+# TED5 generates when it Carmackizes the levels.
+%gamemaps custmaps.ck4
+# This is the CKxMHEAD.OBJ file TED5 generates when Carmackizing the
+# levels. It is needed to load the GAMEMAPS file properly.
+%ckmhead.obj ck4mhead.obj
+%end
+
+Add any documentation files you want inside this subdirectory as
+well.  You should at least include a URL so the end-user can obtain
+the latest version of CKPatch.
+
+Now zip up the subdirectory, such that the subdirectory you created
+is contained inside the zipfile.  Upload the zipfile, and you're
+done!
+
+Please do NOT include the CKxPATCH.EXE executable itself inside your
+zipfile.  I'd rather not have outdated versions of CKPatch floating
+about, as end-users may end up overwriting later versions of CKPatch
+with earlier versions.
+
+-----------------------------------------------------------------------
+
+[Q3] Why doesn't CKPatch recognise my Keen executable?
+
+There's a number of reasons why this might happen.
+
+I may have got the executable image size wrong for your particular
+version of game executable.  If the game executable is
+LZEXE-compressed, try decompressing it using UNP or UNLZEXE first
+and try running CKPatch again.
+
+CKPatch might also not support the particular version you have.  If
+you've got a shareware Keen game (either episodes 1 or 4), then
+download the latest version of that episode and try running CKPatch
+again.  If you've got a registered version, email me and let me know
+what version you have, so I can find out the various offsets and add
+support for your version to CKPatch.
+
+Also, check that your game executable hasn't been modified in any
+way (other than being decompressed).  You might be unlucky enough to
+have a virus roaming around on your system.  If a virus has managed
+to attach itself to your Keen game executable, then this would
+increase the size of the image, causing CKPatch not to recognise it.
+In this case, you'll have to eliminate the virus, then restore your
+game executable from a fresh copy.
+
+-----------------------------------------------------------------------
+
+[Q4] I patch a string using %patch, but it has garbage after it
+
+All Keen games were written in the C language.  In C, strings are
+represented as null-terminated character arrays.  If you patch a
+string, but change the length of the string, you need to place a
+null (ASCII 0) byte to mark the new end of the string.  For example:
+
+# This is just a random offset, so don't try it
+%patch 0x00001234 "Hello World\n" 0x00
+
+-----------------------------------------------------------------------
+
+[Q5] Can CKPatch be adapted for other games?
+
+CKPatch has a modular design; the Parser, Patcher and Loader units
+in the source code are completely independent of Commander Keen and
+can easily be reused to write patching utilities for other 16-bit
+real mode DOS games.
+
+As a start, Apogee's Bio Menace is based on the same engine as
+Commander Keen 4-6, so it should be straightfoward to adapt CKPatch
+to work with Bio Menace, once you know the offsets of all the items
+of interest in the game executables.
+
+CKPatch's in-memory patching methodology can also work well for
+games that have level data hard-linked into the executable.  For
+example, Apogee's Crystal Caves fits into this category.
+
+-----------------------------------------------------------------------
+
+[Q6] CKPatch is now GPL; can I write a closed-source front-end?
+
+The GPL (GNU General Public License) will only affect your program
+if it directly uses source code from CKPatch.  If this is the case,
+then you must release your program under the GPL as well.
+
+If you write a separate stand-alone program that either generates
+patch script files to be fed to CKPatch, or simply invokes CKPatch,
+then under the GPL your program is considered a separate piece of
+work, so you can license your program however you please.
+
+The main reason why I'm releasing CKPatch under the GPL is because I
+have put a lot of voluntary effort into creating and maintaining
+CKPatch, and I would like to protect my work from direct commerical
+exploitation by others.
+
+-----------------------------------------------------------------------
+
+[Q7] I found a bug in CKPatch! What should I do?
+
+First thing to do is check the README.TXT file in the CKPatch
+distribution archive and see if the bug is a problem that I'm
+already aware of.
+
+If there's nothing mentioned in README.TXT about the bug, then you
+should email a bug report to me at <rodgersb@ses.curtin.edu.au>.  In
+your report, try to be as descriptive as possible (don't worry about
+being too verbose), and be sure to include the following
+information:
+
+- Operating system version
+- Environment you're trying to run CKPatch under
+    (Pure DOS/Win9x DOS box etc)
+- Episode/Version of Commander Keen
+- Any files related to the problem (send as email attachments)
+- A description of what you were trying to do
+
+Keep in mind that it is very difficult for me to test CKPatch, due
+to its nature.  Chances are that I most likely don't know about this
+bug, so if you want to see it fixed, it would be a very good idea to
+send a bug report.  You might even get mentioned in the credits!  :)
+
+-----------------------------------------------------------------------
+
+*** END OF FAQ.TXT ***

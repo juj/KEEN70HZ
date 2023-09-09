@@ -1,0 +1,35 @@
+CKPatch (and its sources) are released under the GNU General Public
+License, version 2. The file COPYING.TXT contained within this
+distribution archive explains the full terms of the license.
+Briefly, it states that:
+
+- You are free to distribute this program in its unmodified form to
+  anyone you wish at any cost.
+- If you modify this program in any way, you may also distribute it
+  freely and at any cost providing that you state in the
+  documentation what modifications you made to the original copy and
+  that you make the source code to your modifications freely available.
+- You may not deny anyone access to this original unmodified copy or
+  its source code.
+
+Please note that CKPatch comes AS IS with ABSOLUTELY NO WARRANTY,
+expressed or implied.  The author of CKPatch cannot be held liable
+for any consequential damages caused by the use of this program.
+You must use this program at your own risk.
+
+I would like to point out that prior to version 0.9.0, CKPatch was
+actually released under public domain, since I did not have any
+indication of whether the project was a success or not (CKPatch was
+originally intended just to be a proof-of-concept program, nothing
+more).  Since I cannot revoke the distribution terms for these
+earlier versions once they have been distributed, they will have to
+remain in the public domain, and are not affected by the change to
+the GPL for version 0.9.0.
+
+However, as a sign of courtesy, I would appreciate it if you would
+consider releasing any derived works of any pre-0.9.0 versions of
+CKPatch that you may create under the GPL as well.  There is of
+course no obligation to do this, but I feel it would be in
+everyone's best interests to comply with this request.
+
+Bryan Rodgers <rodgersb@ses.curtin.edu.au>

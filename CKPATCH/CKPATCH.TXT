@@ -1,0 +1,1419 @@
+  ____ _  ______       _       _
+ / ___| |/ /  _ \ __ _| |_ ___| |__
+| |   | ' /| |_) / _` | __/ __| '_ \
+| |___| . \|  __/ (_| | || (__| | | |
+ \____|_|\_\_|   \__,_|\__\___|_| |_|
+
+-----------------------------------------------------------------------
+
+CKPatch v0.11.3 beta
+Copyright (C) 2001-2003 Bryan Rodgers <rodgersb@ses.curtin.edu.au>
+Copyright (C) 2007 Andrew Durdin <me@andy.durdin.net>
+Released to the public under GNU GPL
+
+PROGRAM DOCUMENTATION (CKPATCH.TXT)
+
+-----------------------------------------------------------------------
+
+*** TABLE OF CONTENTS ***
+
+[1] INTRODUCTION
+    [1.1] What is CKPatch?
+    [1.2] Please read this before using the program
+    [1.3] System Requirements
+    [1.4] Installation
+
+[2] PATCHING CONCEPTS
+    [2.1] What is meant by patching?
+    [2.2] How CKPatch works
+    [2.3] Items of interest in patching
+
+[3] USING CKPatch
+    [3.1] Loading existing patch files
+        [3.1.1] Specifying a patch file
+        [3.1.2] Specifying a patch directory
+    [3.2] Creating your own patch files
+        [3.2.1] Patch script basics
+            [3.2.1.1] Comments
+            [3.2.1.2] Macro commands
+            [3.2.1.3] Macro arguments
+        [3.2.2] Specifying file names in patch files
+        [3.2.3] Numeric formats
+        [3.2.4] Dealing with syntax errors
+        [3.2.5] Specifying executable image offsets
+    [3.3] Syntax reference
+        [3.3.1] General commands
+            [3.3.1.1] %ext (Specify game extension)
+            [3.3.1.2] %patch (Patch arbitrary bytes)
+            [3.3.1.3] %patchfile (Load patch data from file)
+            [3.3.1.4] %version (Check for specific version)
+            [3.3.1.5] %dump (Writes section of memory to file)
+            [3.3.1.6] %end (Terminates patch file)
+            [3.3.1.7] %abort (Aborts patching)
+        [3.3.2] Keen 1-3 specific commands
+            [3.3.2.1] %level.dir (Specifies level directory)
+            [3.3.2.2] %level.file (Specifies level file)
+            [3.3.2.3] %egahead (Specifies EGAHEAD replacement data file)
+            [3.3.2.4] %egasprit (Specifies EGASPRIT replacement data file)
+            [3.3.2.5] %egalatch (Specifies EGALATCH replacement data file)
+        [3.3.3] Keen 1 specific commands
+            [3.3.3.1] %level.hint (Yorp/Garg statue hint messages)
+        [3.3.4] Keen 4-6 specific commands
+            [3.3.4.1] %level.name (Specifies level name)
+            [3.3.4.2] %level.entry (Specifies level entry text)
+            [3.3.4.3] %gamemaps (Specifies GAMEMAPS replacement data file)
+            [3.3.4.4] %egagraph (Specifies EGAGRAPH replacement data file)
+            [3.3.4.5] %audio (Specifies AUDIO replacement data file)
+            [3.3.4.6] %audiohed (Loads AUDIOHED resource data from file)
+            [3.3.4.7] %egahead (Loads EGAHEAD resource data from file)
+            [3.3.4.8] %maphead (Loads MAPHEAD resource data from file)
+            [3.3.4.9] %audiodct (Loads AUDIODCT resource data from file)
+            [3.3.4.10] %egadict (Loads EGADICT resource data from file)
+            [3.3.4.11] %ckmhead.obj (Loads MAPHEAD resource data from file)
+            [3.3.4.12] %tileinfo (Loads TILEINFO resource data from file)
+        [3.3.5] Keen 4 specific commands
+            [3.3.5.1] %level.hint (Princess Lindsey hint messages)
+
+[4] ADVANCED TOPICS
+    [4.1] How to distribute patches and level packs
+    [4.2] How to load levels created in TED5 into Keen 4-6
+
+[5] MISCELLANEOUS
+    [5.1] Credits
+    [5.2] Distribution license
+    [5.3] Disclamer and warranty (or lack thereof)
+    [5.4] Reporting bugs or sending comments
+
+-----------------------------------------------------------------------
+
+[1] INTRODUCTION
+
+[1.1] What is CKPatch?
+
+CKPatch is a set of utilities I've written which enable id
+Software's Commander Keen games to load alternate level files
+without needing to make any modification to the original game
+executables or data files on disk.  Features include custom patching
+of various strings in the game (such as level names, level entry and
+hint messages) and arbitrary byte patches to change operation of
+other features in the game.  All patching information is read from a
+text-format patch script file.
+
+[1.2] Please read this before using the program
+
+Please be aware that CKPatch is NOT a product of id Software, and
+the author of CKPatch is NOT associated with id Software in any way.
+id Software will NOT provide any form of support for this program or
+any issues that may occur while using this program in conjunction
+with Commander Keen.  If you have problems or concerns about this
+program, do NOT contact id Software - instead see section 5.4 of
+this document for details on contacting the author.
+
+[1.3] System Requirements
+
+CKPatch requires the following:
+    - 8086 or compatible processor
+    - DOS 3.3 or later
+    - 540kB free conventional memory for Commander Keen 1 thru 3
+    - 580kB free conventional memory for Commander Keen 4 thru 6
+
+A registered version of Commander Keen episodes 1 thru 6, or a
+shareware version of episodes 1 or 4 is also required.  Put simply,
+if you can run Commander Keen on your system, you should be able to
+run CKPatch fine.
+
+CKPatch has been tested under the following operating environments:
+    - MS-DOS 6.22
+    - Microsoft Windows 95/98 DOS box
+
+In each of these environments, CKPatch appears to work as intended.
+If you have had any success or failure with running CKPatch under an
+operating environment not covered above, please let me know; see
+section 5.4 of this document for details on contacting the author.
+
+[1.4] Installation
+
+For each of the six CKxPATCH.EXE executables (where x=1-6), place
+them in the same directory as their respective KEENx.EXE game
+executable.
+
+The six CKxPATCH.EXE executables need to be able to find their
+corresponding KEENx.EXE game executables in order to load the game
+and apply patches.
+
+For example, if you keep each Commander Keen episode in the
+directory C:\GAMES\KEENx (where x=1-6), then the following DOS
+commands would perform the required installation (assuming you
+unpacked the CKPatch binary distribution archive into the current
+directory):
+
+    COPY CK1PATCH.EXE C:\GAMES\KEEN1\
+    COPY CK2PATCH.EXE C:\GAMES\KEEN2\
+    COPY CK3PATCH.EXE C:\GAMES\KEEN3\
+    COPY CK4PATCH.EXE C:\GAMES\KEEN4\
+    COPY CK5PATCH.EXE C:\GAMES\KEEN5\
+    COPY CK6PATCH.EXE C:\GAMES\KEEN6\
+
+In this document, each of the six executables will be collectively
+referred to as CKPatch, as they all share the same base
+functionality.  However please keep in mind that you always need to
+launch the CKxPATCH.EXE executable that corresponds to the episode
+of Commander Keen that you wish to run, as the individual
+CKxPATCH.EXE executables contain episode-specific information for
+patching the respective episode.
+
+-----------------------------------------------------------------------
+
+[2] PATCHING CONCEPTS
+
+[2.1] What is meant by patching?
+
+This is a brief introduction to what patching is about; you may skip
+over to section 2.2 if you are already familiar with the basic
+concepts of patching.
+
+Patching in computing jargon basically refers to modifiying specific
+information, usually arbitrary bytes in disk files or in memory.
+When computer software is patched, the executable machine code or
+data files that comprise the software is modified in order to affect
+the behaviour of the software in an intentional manner.
+
+If you're into gaming, you may have heard of programs called cheat
+trainers.  These are programs that are designed to modify the
+behaviour of the game that they are designed for.  When the cheat
+trainer program is launched, it launch the game but stay in the
+system's memory for the duration of the game.  The cheat trainer
+program monitors and intercepts various operations that the game
+performs, and often changes the results of the operations, in order
+to trick the game into running in a way that it otherwise normally
+wouldn't.  Usually the intent of this to allow the player to cheat
+at the game.
+
+CKPatch works a lot like a cheat trainer.  It can modify certain
+data within the Commander Keen game executables and also trick the
+game into opening replacement level and data files, allowing the
+graphics and levels in the games to be substituted with user-made
+graphics/levels.  All this behaviour can be customised via a patch
+script file which contains a command set for specialised patching
+operations.
+
+[2.2] How CKPatch works
+
+CKPatch takes advantage of an undocumented DOS API call which loads
+an executable into memory but does not execute it straight away.
+
+On invocation of CKPatch, you specify the name of the patch script
+file as a parameter, followed by any parameters you want to pass to
+the game itself.  CKPatch will then load the respective KEENx.EXE
+game executable, parse the patch script file, and make the
+modifications to the game executable in memory before launching the
+game.
+
+Patch scripts can also contain references to an alternate set of
+game data/level files.  When these are specified, then during the
+game, file open requests for the game's original files will be
+redirected to the alternate set of files.  This allows you to use
+alternate level and data files without having to rename or overwrite
+your original game files.  It also makes it easy for managing
+multiple level packs, since you can install each level pack in a
+separate subdirectory inside your game directory.
+
+No game files are modified on disk in any way, so you need not worry
+about bad patches that corrupt your game executable or data files,
+which would otherwise require a reinstall.  The worst thing that can
+happen with CKPatch is possibly the game crashing or aborting with
+an error message if a patch command overwrites the game's executable
+code or important data structures in memory.
+
+Please note that CKPatch is not memory-resident; it will only stay
+in memory during the execution of the game, and will automatically
+unload itself from memory when the game exits.
+
+[2.3] Items of interest in patching
+
+CKPatch is capable of modifying the following aspects of each
+Commander Keen game:
+
+Keen 1 specific:
+    - The text messages that each of the Yorp/Garg statues give you.
+
+Keen 1-3 specific:
+    - The location of each level file.
+    - The location of the EGAHEAD, EGASPRIT and EGALATCH data files.
+
+Keen 4-6 specific:
+    - The locations of the GAMEMAPS, EGAGRAPH and AUDIO data files.
+    - The names of each of the levels (that are shown when you press
+      enter to get the status box).
+    - The entry text for each level that appears when you enter a
+      level from the world map.
+
+Keen 4 specific:
+    - The hints that Princess Lindsey gives you.
+
+General:
+    - Arbitrary patches can also be applied.  These are in the form
+      of binary files that can be loaded into a specific offset in
+      the game executable in memory, as well as inline byte strings
+      where the new bytes to patch are specified directly in the
+      patch script file.  With this functionality, other messages
+      and some sprite behaviour can be modified as well, if you know
+      what offsets to modify.
+
+-----------------------------------------------------------------------
+
+[3] USING CKPatch
+
+[3.1] Loading existing patch files
+
+CKPatch provides two ways of loading patch files.  You can specify
+the name of the patch file directly, if the patch file is
+stand-alone.  If the patch file comes with some additional data
+files, then CKPatch will also allow you to store all the files
+associated with the patch in a separate subdirectory under your Keen
+game directory so you can launch the patch simply by specifying the
+name of the subdirectory that the patch is stored in.
+
+[3.1.1] Specifying a patch file
+
+To use a stand-alone patch script file, simply specify the name of
+the patch script file as the first command-line argument to CKPatch.
+Any following arguments are passed onto the game itself.
+
+Syntax:
+
+CKxPATCH <scriptfile> [game arguments]
+
+Example:
+
+CK1PATCH mypatch.pat
+
+[3.1.2] Specifying a patch directory
+
+Patch script files can also reside in subdirectories, along with any
+additional files that are associated with them.  Patch script files
+stored in a subdirectory of their own need to be named PATCH.PAT so
+CKPatch can locate the patch script file when supplied with just the
+name of the subdirectory.
+
+Syntax:
+
+CKxPATCH <patchdir> [game arguments]
+
+Example:
+
+Let's say that your copy of Commander Keen 4 is located in
+C:\GAMES\KEEN4.  You download a level pack called MYKEEN4 that
+contains the files GAMEMAPS.CK4, MAPHEAD.CK4 and PATCH.PAT.
+
+But the problem is that you also like to play the original Commander
+Keen 4 levels as well from time to time.  So you'd rather not
+overwrite your original game files and you don't want to have to
+bother renaming files all the time or having two different copies of
+Commander Keen 4 installed.
+
+CKPatch helps you out here.  Create a subdirectory called MYKEEN4
+inside your Commander Keen 4 directory, and place the files that
+belong to this level pack inside this directory.  Your directory
+layout should look like the following:
+
+    C:\GAMES\KEEN4 (Keen 4 main directory)
+          |
+          +--- MYKEEN4 (Level pack subdirectory)
+          |       |
+          |       + GAMEMAPS.CK4 (Map data for MYKEEN4 level pack)
+          |       + MAPHEAD.CK4 (Map header for MYKEEN4 level pack)
+          |       + PATCH.PAT (Patch file for MYKEEN4 level pack)
+          |
+          + CK4PATCH.EXE (CKPatch executable for Keen 4)
+          + AUDIO.CK4 (Original Keen 4 game data file)
+          + EGAGRAPH.CK4 (Original Keen 4 game data file)
+          + GAMEMAPS.CK4 (Original Keen 4 game data file)
+          + KEEN4E.EXE (Original Keen 4 game executable)
+
+To load the MYKEEN4 level pack without having to mess about with any
+of the original game files, change to your Keen 4 main directory
+(C:\GAMES\KEEN4 in above example) and type the command:
+
+CK4PATCH MYKEEN4
+
+[3.2] Creating your own patch files
+
+Note that some sample script files are included in the CKPatch
+distribution archive.  You can also read the comments in them to
+find out how they work.
+
+[3.2.1] Patch script basics
+
+Patch script files are plain ASCII text files that consist of a
+sequence of macro commands that each have zero or more arguments
+following them.  Patch script files can also have comments
+documenting the purpose of each macro command in a human-friendly
+manner.
+
+[3.2.1.1] Comments
+
+Comments are marked by a hash character '#'.  Any text appearing
+after the comment marker to the end of the line is ignored by
+CKPatch. Comments may appear anywhere in the script file.
+
+Examples:
+
+# This is a comment on a line of its own.
+
+%ext ck1        # This is a comment appearing after a command.
+
+[3.2.1.2] Macro commands
+
+Macro commands always start with a percent sign '%' and must appear
+as the first word on the line (although they can be indented with
+spaces or tabs if desired).  You can only have a maximum of one
+macro command per line, however you can have any number of blank
+lines separating consecutive macro commands.  Macro commands are
+case-insensitive.
+
+Examples:
+
+# Command is %ext. This is valid.
+%ext ck1
+
+# Command is %dump. This is also valid.
+    %dump keen1.img
+
+# Error: %end must appear at the start of a new line.
+%level.dir mykeen1 %end
+
+[3.2.1.3] Macro arguments
+
+Macro arguments follow a macro command, and are delimited from the
+macro command by whitespace and/or carriage returns.  Macro
+arguments generally fall into three different catagories; strings,
+integers and text streams.
+
+String arguments are terminated either by spaces or the end of a
+line.  You may need to enclose string arguments in double quotes if
+the argument contains either a '%' or '#' character, or a space.
+Double quoted strings may not span over more than one line.  Within
+double-quoted strings, you may also use C-style backslash escape
+sequences if needed.  String arguments are usually used to specify
+file names and paths.
+
+Integer arguments generally follow the same form as string
+arguments, except they are interpreted as an integer.  See section
+3.2.3 for more details on numeric formats.
+
+Text stream arguments follow different formatting rules.  They start
+from the first non-whitespace character that is encountered after
+the previous argument, and are terminated by the next macro command
+that is encountered.  Text streams span multiple lines if necessary,
+and the carriage returns used to end each line also form part of the
+text stream.  Note that comments are still stripped out as usual, so
+if you need to specify a '#' or '%' character in a text stream
+argument, then you need to precede it with a backslash character
+'\'.  Text stream arguments are usually used to specify
+multiple-line messages.
+
+Examples:
+
+# An integer argument followed by a string argument
+%patchfile 0x0010300 file.dat
+
+# An integer argument followed by a string argument, then another
+# integer argument. Note the line break between arguments.
+%patch 0x0010300
+    "Hello world!\n" 0x00
+
+# An integer argument followed by a text stream, followed by another
+# command.
+%level.hint 2
+This is a hint
+message that spans
+multiple lines.
+%end
+
+[3.2.2] Specifying file names in patch files
+
+When you give filenames that are relative paths (they don't contain
+any drive letters and don't start at the root directory), the path
+is taken to be relative to the file that the patch script file
+resides in.
+
+If you launched CKPatch by specifying a directory name, then the
+base directory for any relative paths specified in the script file
+will be the directory that you specified on the command line.
+
+For replacement game level and data files, make sure you specify the
+file names correctly because CKPatch will not verify if they exist.
+If a replacement game or data file does not exist, then CKPatch
+won't be able to redirect the game to the replacement file, causing
+the game to fail to open the requested file.
+
+If this is the case, Keen 1-3 will show garbage for level files they
+can't find and Keen 4-6 will bomb to DOS with an error message.
+
+[3.2.3] Numeric formats
+
+Wherever an integer is required for a macro argument, you can either
+specify the number in decimal, or hexadecimal with either a leading
+Pascal-style '$' character or a C-style '0x' sequence.
+
+The values (apart from the offset) for the %patch command must have
+a 'W' suffix if a 16-bit integer, or a 'L' suffix if a 32-bit integer.
+The suffix may be uppercase or lowercase.  The suffix may instead be
+'RW' or 'RL'; see section 3.3.1.2 for details.
+
+Examples:
+
+# First integer argument is in decimal
+# Second integer argument is in Pascal-style hexadecimal
+# Third integer argument is in C-style hexadecimal
+%patch 10 $0A 0x0A
+
+[3.2.4] Dealing with syntax errors
+
+If there is a syntax error in your script file, CKPatch will stop
+patching, print an error message and abort.  The error message will
+contain the name of the file, the line and column numbers of the
+error in the file, a brief description of what the parser was
+expecting and also a line of context to highlight where the error
+is.
+
+Example input:
+
+%ext ck1
+%patchfile x00030010 stuff.bin
+%end
+
+Example output:
+
+Error: mykeen1.pat:2:12: Invalid numeric format
+%patchfile x00030010 stuff.bin
+           ^
+
+[3.2.5] Specifying executable image offsets
+
+Image offsets are individual byte locations within the game
+executable image.  The game executable image is the section of the
+game EXE file that gets loaded into memory when you run it.
+
+There are a number of ways of obtaining the image offset of a
+particular string or other item in the game executable that you wish
+to patch.
+
+One way is to decompress the game executable using a utility like
+UNP or UNLZEXE, since the Keen executables that are shipped are
+compressed with LZEXE.  You can then search the uncompressed
+executable directly for items to patch using a hex viewer.
+
+UNP and UNLZEXE can be obtained from the following FTP locations:
+
+ftp://ftp.simtel.net/pub/simtelnet/msdos/execomp/unp411.zip
+ftp://ftp.simtel.net/pub/simtelnet/msdos/execomp/unlzexe8.zip
+
+If you need to grab a simple hex viewer, one well known DOS-based
+file viewer is Vernon D. Buerg's LIST, available at the following
+FTP location:
+
+ftp://ftp.simtel.net/pub/simtelnet/msdos/txtutl/list93a.zip
+
+However there's a catch to this method; the file offsets given to
+you by the hex viewer will include the EXE file header.  Although it
+would seem easy to have CKPatch just take the file offsets directly
+and translate them into image offsets, there's a number of reasons
+why this task isn't as easy as it seems.
+
+If you try decompressing the game executable using the utilities UNP
+and UNLZEXE, you'll get slightly different results.  When UNP
+decompresses the executable it just writes the EXE file header as
+is, but UNLZEXE pads it off to the next 512-byte multiple.  This
+would make any specific offsets into the file unreliable as it then
+depends on how big the header is.  Also, the header is not loaded
+into memory anyway, only the EXE file image is, and that's what
+CKPatch is looking at.
+
+To get the header size of the EXE file, run UNP with the 'i'
+command.  Then subtract the header size from the overall file offset
+to get the image offset.
+
+For the programmers wishing to write utilites that will work
+regardless of what the header size is, you can find out what the
+size of the EXE header is by reading the 16-bit unsigned integer at
+offset 8 in the EXE file and multiplying it by 16.  The rest of the
+file is the EXE image data.
+
+Another way is to simply use the %dump command (see section 3.3.1.5
+below for more info).  Type the following commands into a patch file
+(substitute 1 with desired episode number) and run it with CKPatch.
+
+%ext ck1
+%dump keen1.img
+%abort
+%end
+
+This will produce a file called keen1.img which will contain the
+image portion of the game executable.  View this file in your hex
+viewer and search for the item that you want to patch.  Your hex
+viewer will tell you the offset in this file of the item you want to
+patch; this is the number that you need to use for the image offset
+argument in the %patch or %patchfile command.
+
+[3.3] Syntax reference
+
+In the command syntax descriptions below, any item that is specified
+with angled brackets < > is a mandatory argument, and any item
+specified in square brackets [ ] is an optional argument.
+
+[3.3.1] General commands
+
+These commands can be used with any episode.
+
+[3.3.1.1] %ext (Specify game extension)
+
+%ext <game-extension>
+
+This specifies the extension-type for the game.  <game-extension> is
+the three-letter extension for the episode, ck1 thru ck6.
+Initially, this command may not seem to provide any useful
+information, since the six different executables know what extension
+they are expecting.
+
+However in future versions of CKPatch, if I decide to combine the
+six executables into one single executable, this command will be
+needed to tell the CKPatch what game episode it should be loading.
+
+Therefore the %ext command is required for future compatibility and
+must be the first command in each patch script file.
+
+Example:
+
+%ext ck1
+
+[3.3.1.2] %patch (Patch arbitrary bytes)
+
+%patch <offset> <bytestring>
+
+This specifies an inline patch byte string, which is applied to the
+game executable image in memory.  <offset> is an integer argument
+which specifies the offset into the load image (see section 3.2.5).
+<bytestring> is a mixed sequence containing integers, each
+representing a byte, 16-bit integer, or 32-bit integer, and strings
+of characters enclosed in double quotes, which specify a series of
+bytes.  Inside the double quotes you can specify C-style backslash
+escape sequences to be able to specify non-printable characters.
+
+16-bit integers must have a 'W' suffix; 32-bit integers must have an
+'L' suffix.  The suffixes may be uppercase or lowercase.
+
+An 'RW' or 'RL' suffix may be used instead; this indicates that the
+value should be adjusted by the base address where the game was
+loaded into memory.  This allows you to patch segment addresses (with
+a 16-bit integer) or far pointers (with a 32-bit integer).  In each
+case, the segment value must be relative to the start of the image,
+and will differ from the segment addresses seen in an image dump.
+
+You can identify the correct image-relative segment value to use by
+finding the pointer to patch in the uncompressed .exe file, where it
+has not yet been adjusted by DOS.
+
+Note that a maximum 256 bytes can be specified in the <bytestring>
+argument.  If you need to encode a patch string that is longer than
+256 bytes, then you'll need to use multiple %patch commands.
+
+Examples:
+
+# Don't try these out, they're just random offsets!
+%patch 0x00001234 "This is a test message\n" 0x00
+%patch 0x000055AA
+    "Hello World!\n"
+    "This is the second line\n" 0x00
+
+# These patches are equivalent
+%patch 0x000055AA  $CD $AB $78 $56 $34 $12
+%patch 0x000055AA  $ABCDW $12345678L
+
+# Patch two far pointers: an offset and segment, then a full pointer
+%patch 0x31DB0
+	$16C9W $09DCRW
+	$10803809RL
+
+[3.3.1.3] %patchfile (Load patch data from file)
+
+%patchfile <offset> <file> [seek [length]]
+
+Loads the file specified by <file> into the executable image in
+memory at the offset given by <offset>.  [seek] and [length] are
+both optional integer arguments that specify the starting file
+offset (0 is the start of file) and maximum number of bytes to read
+into memory.  If the [seek] and [length] arguments are both omitted,
+then the entire file is read into memory starting from the
+beginning.
+
+Examples:
+
+# Don't try these out either!
+%patchfile 0x00001234 data.bin
+%patchfile 0x000055AA stuff.bin 122 402
+
+[3.3.1.4] %version (Check for specific version)
+
+%version <version>
+
+All commands following this one up to the next %version command will
+only be executed if the game executable version matches the
+specified version.  This is intended for user-defined patches where
+the offsets differ between different game versions, so patch scripts
+will be able to work with all versions of the game.  To allow for
+all versions of the game, specify the keyword 'all' for the
+<version> parameter.
+
+Example:
+
+%version 1.0
+    # ... some v1.0-specific commands ...
+%version 1.4
+    # ... some v1.4-specific commands ...
+%version all
+    # ... version-independent commands ...
+
+[3.3.1.5] %dump (Writes section of memory to file)
+
+%dump <file> [offset [length]]
+
+Dumps the executable image in memory in its current state to the
+file named by the <file> argument.  The main idea behind the %dump
+command is so you can verify if your patches are being applied to
+the correct offsets.  The optional [offset] and [length] integer
+arguments allow a specific byte range within the image to be dumped
+to the file.
+
+If the [length] argument is omitted, the image from the given offset
+to the end of file is dumped.  If both the [offset] and [length]
+arguments are omitted, the entire image is dumped to the file.
+
+Example:
+
+%dump keen1.img
+
+[3.3.1.6] %end (Terminates patch file)
+
+%end
+
+Specifies end of patching file.  This must be the last command in
+the patch script file.  Any text that appears after %end is ignored.
+
+[3.3.1.7] %abort (Aborts patching)
+
+%abort
+
+This halts patching and causes CKPatch to terminate.  Best used with
+the %dump command (see section 3.3.1.5) if the patches you've
+specified are causing the game to crash.
+
+[3.3.2] Keen 1-3 specific commands
+
+These commands are only available with the CK1PATCH.EXE,
+CK2PATCH.EXE and CK3PATCH.EXE executables.
+
+[3.3.2.1] %level.dir (Specifies level directory)
+
+%level.dir <dir>
+
+Specifies <dir> as the default directory for levels not specified
+with the %level.file command (see section 3.3.2.2).  If <dir> is a
+relative path, it is presumed to be relative to the directory the
+patch script file is in.
+
+If you create a level pack for Keen 1, 2 or 3 that replaces ALL
+level files, including the world map (LEVEL80.CKx), ending sequence
+map (LEVEL81.CKx) and title screen map (LEVEL90.CKx), then place all
+the LEVEL##.CKx files inside your level pack subdirectory (see
+section 3.1.2) and specify the current directory '.' as the <dir>
+argument, as follows:
+
+%level.dir .
+
+Otherwise if your level pack leaves some maps unchanged, then you're
+better off using the %level.file command, since using %level.dir in
+this case would cause the game not to find the level files that you
+didn't supply in your level pack.
+
+[3.3.2.2] %level.file (Specifies level file)
+
+%level.file <n> <file>
+
+Specifies file <file> to be used for level <n>.  Unlike the
+%level.dir command (section 3.3.2.1), this command only affects
+level <n>.  If <file> contains a relative path, then it is presumed
+to be relative to the directory that the patch script file resides
+in.
+
+In other words, when the game tries to open the file LEVEL<n>.CKx,
+CKPatch will cause the game to open the file specified by <file>
+instead.
+
+The following values of <n> correspond to the following maps:
+
+    n:      Corresponding map:
+    1-16    Levels 1-16
+    80      World map
+    81      Ending sequence map
+    90      Title screen level
+
+Andrew Durdin mentions in his KeenEdit documentation that Keen 1
+will also accept 22, 26, 29, 30 and 31 for <n> as well, if you want
+to have more than 16 levels in your level pack.
+
+Note that due to memory constraints, you can replace a maximum of 24
+level files using the %level.file command.  If, by some chance, you
+happen to exceed this limit, you'll need to look at using the
+%level.dir command instead.
+
+Example:
+
+# Replaces levels 1 and 2 with custom levels
+%level.file 1 mylvl01.ck1
+%level.file 2 mylvl02.ck1
+
+[3.3.2.3] %egahead (Specifies EGAHEAD replacement data file)
+
+%egahead <file>
+
+Specifies file <file> to be used as a replacement for the
+EGAHEAD.CKx game data file.  The EGAHEAD.CKx file contains tile
+indexes for the EGASPRIT.CKx and EGALATCH.CKx game data files.  If
+<file> contains a relative path, then it is presumed to be relative
+to the directory that the patch script file resides in.  This
+command may be useful if your level pack contains replacement
+graphics.
+
+Example:
+
+%egahead myhead.ck1
+
+[3.3.2.4] %egasprit (Specifies EGASPRIT replacement data file)
+
+%egasprit <file>
+
+Specifies file <file> to be used as a replacement for the
+EGASPRIT.CKx game data file.  The EGASPRIT.CKx file contains the
+raster data for all the sprites in the game.  If <file> contains a
+relative path, then it is presumed to be relative to the directory
+that the patch script file resides in.  This command may be useful
+if your level pack contains replacement graphics.
+
+Example:
+
+%egasprit mysprit.ck1
+
+[3.3.2.5] %egalatch (Specifies EGALATCH replacement data file)
+
+%egalatch <file>
+
+Specifies file <file> to be used as a replacement for the
+EGALATCH.CKx game data file.  The EGALATCH.CKx file contains raster
+data for all the background tiles in the game.  If <file> contains a
+relative path, then it is presumed to be relative to the directory
+that the patch script file resides in.  This command may be useful
+if your level pack contains replacement graphics.
+
+Example:
+
+%egalatch mylatch.ck1
+
+[3.3.3] Keen 1 specific commands
+
+These commands are only available with the CK1PATCH.EXE executable.
+
+[3.3.3.1] %level.hint (Yorp/Garg statue hint messages)
+
+%level.hint <n> [text]
+
+Changes the text that the Yorp or Garg statue for level <n> gives
+you.  It does not include the 'Press ENTER' footer at the bottom.
+<n> may only be 2,6,9,10,11,12 or 15.  Lines of text are seperated
+by putting carriage returns in the text.  The limit on the message
+is 20 characters per line, and a maximum of 7 lines for all levels
+except for level 11 (4 lines) and level 15 (6 lines).  The message
+is automatically padded with spaces/blank lines.  See the sample
+patch file KEEN1.PAT for some good examples of this command.
+
+[3.3.4] Keen 4-6 specific commands
+
+These commands are only available with the CK4PATCH.EXE,
+CK5PATCH.EXE and CK6PATCH.EXE executables.
+
+[3.3.4.1] %level.name (Specifies level name)
+
+%level.name <n> [text]
+
+Changes the level name of level <n>.  The level name is the text
+that you'll see in the level field in the status display when you
+press ENTER during the game.
+
+For Keen 4 and 6, <n> must be betwen 0 and 18.  For Keen 5, <n> must
+be between 0 and 15.  0 is the world map, and so on...
+
+You may find that you'll have to insert carriage returns
+periodically if the name overflows the width of the level field box
+in the game status window.  The font that Keen 4-6 uses is a
+proportional-width font, so you'll have to use trial-and-error in
+order to get the name displaying correctly.  A carriage return
+counts as one character (ASCII 10) towards the character limit (see
+below).
+
+Character limits on the lengths of each level name are as follows.
+If the character limit is exceeded for any particular level, then
+CKPatch will terminate with an error message.
+
+Keen 4 level names:
+Level:                  Max chars:
+0-2,5-10,15-17          15
+3,4,11,12,14,18         31
+13                      47
+
+Keen 5 level names:
+Level:                  Max chars:
+0,2,13-15               15
+1,3-12                  31
+
+Keen 6 level names:
+Level:                  Max chars:
+0,2,5,7,9-11,16,18      15
+1,3,4,6,8,12-15,17      31
+
+Example:
+
+%level.name 12 CKPatch Headquarters
+
+[3.3.4.2] %level.entry (Specifies level entry text)
+
+%level.entry <n> [text]
+
+Changes the level entry message of level <n>.  This is the message
+that you'll see when Keen enters the level from the world map.
+
+For Keen 4 and 6, <n> must be betwen 0 and 18.  For Keen 5, <n> must
+be between 0 and 15.  0 is the world map, and so on...
+
+You may find that you'll have to insert carriage returns
+periodically if the message overflows the width of the dialog box
+that it is displayed in.  The font that Keen 4-6 uses is a
+proportional-width font, so you'll have to use trial-and-error in
+order to get the message displaying correctly.  A carriage return
+counts as one character (ASCII 10) towards the character limit (see
+below).
+
+Character limits on the lengths of each message are as follows.  If
+the character limit is exceeded for any particular message, then
+CKPatch will terminate with an error message.
+
+Keen 4 level entry messages:
+Level:                  Max chars:
+0,2,7,9                 31
+1,3,5,6,8,10-12,15-17   47
+4,13,14,18              63
+
+Keen 5 level entry messages:
+Level:                  Max chars:
+0-10,12-14              47
+11,15                   63
+
+Keen 6 level entry messages:
+Level:                  Max chars:
+0,7                     31
+1-6,8-10,12,16-18       47
+13-15                   63
+11                      79
+
+Example:
+
+%level.entry 12
+Keen patches his way into
+CKPatch Headquarters
+
+[3.3.4.3] %gamemaps (Specifies GAMEMAPS replacement data file)
+
+%gamemaps <file>
+
+Specifies file <file> to be used as a replacement for the
+GAMEMAPS.CKx game data file.  The GAMEMAPS.CKx file contains the
+compressed map data for all the levels in the game.  If <file>
+contains a relative path, then it is presumed to be relative to the
+directory that the patch script file resides in.
+
+This command is required in conjunction with either %maphead
+(section 3.3.4.8) or %ckmhead.obj (section 3.3.4.11) in order to
+load custom levels in Keen 4-6.
+
+If a %gamemaps command does not appear in the patch script, then the
+GAMEMAPS.CKx file in the main game directory will be used instead.
+
+Example:
+
+%gamemaps mymaps.ck4
+
+[3.3.4.4] %egagraph (Specifies EGAGRAPH replacement data file)
+
+%egagraph <file>
+
+Specifies file <file> to be used as a replacement for the
+EGAGRAPH.CKx game data file.  The EGAGRAPH.CKx file contains
+compressed raster data for all the tiles in the game.  If <file>
+contains a relative path, then it is presumed to be relative to the
+directory that the patch script file resides in.
+
+This command is required in conjunction with %egahead (section
+3.3.4.7) and %egadict (section 3.3.4.10) in order to be able to load
+replacement graphics into the game.
+
+If a %egagraph command does not appear in the patch script, then the
+EGAGRAPH.CKx file in the main game directory will be used instead.
+
+Example:
+
+%egagraph mygraph.ck4
+
+[3.3.4.5] %audio (Specifies AUDIO replacement data file)
+
+%audio <file>
+
+Specifies file <file> to be used as a replacement for the AUDIO.CKx
+game data file.  The AUDIO.CKx file contains compressed sound
+effects and music for the game.  If <file> contains a relative path,
+then it is presumed to be relative to the directory that the patch
+script file resides in.
+
+This command is required in conjunction with %audiohed (section
+3.3.4.6) and %audiodct (section 3.3.4.9) in order to be able to load
+replacement sound effects and music into the game.
+
+If an %audio command does not appear in the patch script, then the
+AUDIO.CKx file in the main game directory will be used instead.
+
+Example:
+
+%audio myaudio.ck4
+
+[3.3.4.6] %audiohed (Loads AUDIOHED resource data from file)
+
+%audiohed <file>
+
+Loads file <file> into the AUDIOHED resource in the executable
+image.  The AUDIOHED resource contains the indexes of each sound
+effect or song in the AUDIO.CKx game data file.  If <file> contains
+a relative path, then it is presumed to be relative to the directory
+that the patch script file resides in.
+
+Note that the AUDIOHED resource has a fixed size in each of the Keen
+4-6 executables, so there is a maximum limit on the number of bytes
+that will be read from the file in order to avoid overwriting
+neighbouring resources in the image.  The maximum size limits for
+each episode are:
+
+Episode:    Size of AUDIOHED resource (bytes):
+Keen 4      664
+Keen 5      840
+Keen 6      768
+
+This command is required in conjunction with %audio (section
+3.3.4.5) and %audiodct (section 3.3.4.9) in order to be able to load
+replacement sound effects and music into the game.
+
+If an %audiohed command does not appear in the patch script, then
+the default AUDIOHED resource data in the game executable will be
+used.
+
+Example:
+
+%audiohed myaudhed.ck4
+
+[3.3.4.7] %egahead (Loads EGAHEAD resource data from file)
+
+%egahead <file>
+
+Loads file <file> into the EGAHEAD resource in the executable image.
+The EGAHEAD resource contains the indexes of each raster tile in the
+EGAGRAPH.CKx game data file.  If <file> contains a relative path,
+then it is presumed to be relative to the directory that the patch
+script file resides in.
+
+Note that the EGAHEAD resource has a fixed size in each of the Keen
+4-6 executables, so there is a maximum limit on the number of bytes
+that will be read from the file in order to avoid overwriting
+neighbouring resources in the image.  The maximum size limits for
+each episode are:
+
+Episode:    Size of EGAHEAD resource (bytes):
+Keen 4      14256
+Keen 5      14800
+Keen 6      16688
+
+This command is required in conjunction with %egagraph (section
+3.3.4.4) and %egadict (section 3.3.4.10) in order to be able to load
+replacement graphics into the game.
+
+If an %egahead command does not appear in the patch script, then the
+default EGAHEAD resource data in the game executable will be used.
+
+Example:
+
+%audiohed myaudhed.ck4
+
+[3.3.4.8] %maphead (Loads MAPHEAD resource data from file)
+
+%maphead <file>
+
+Loads file <file> into the MAPHEAD resource in the executable image.
+The MAPHEAD resource contains the indexes of each level in the
+GAMEMAPS.CKx game data file.  If <file> contains a relative path,
+then it is presumed to be relative to the directory that the patch
+script file resides in.
+
+Note that the MAPHEAD resource has a fixed size of 402 bytes, so
+only the first 402 bytes will be read from the given file in order
+to avoid overwriting neighbouring resources in the image.
+
+This command is required in conjunction with %gamemaps (section
+3.3.4.3) in order to load custom levels in Keen 4-6.
+
+If a %maphead command does not appear in the patch script, then the
+default MAPHEAD resource data in the game executable will be used.
+
+Example:
+
+%maphead mymaphed.ck4
+
+[3.3.4.9] %audiodct (Loads AUDIODCT resource data from file)
+
+%audiodct <file>
+
+Loads file <file> into the AUDIODCT resource in the executable
+image.  The AUDIODCT resource contains the Huffman tree required for
+decompressing each sound effect or song in the AUDIO.CKx game data
+file.  If <file> contains a relative path, then it is presumed to be
+relative to the directory that the patch script file resides in.
+
+Note that the AUDIODCT resource has a fixed size of 1024 bytes, so
+only the first 1024 bytes will be read from the given file in order
+to avoid overwriting neighbouring resources in the image.
+
+This command is required in conjunction with %audio (section
+3.3.4.5) and %audiohed (section 3.3.4.6) in order to be able to load
+replacement sound effects and music into the game.
+
+If an %audiodct command does not appear in the patch script, then
+the default AUDIODCT resource data in the game executable will be
+used.
+
+Example:
+
+%audiodct myauddct.ck4
+
+[3.3.4.10] %egadict (Loads EGADICT resource data from file)
+
+%egadict <file>
+
+Loads file <file> into the EGADICT resource in the executable image.
+The EGADICT resource contains the Huffman tree required for
+decompressing each raster tile in the EGAGRAPH.CKx game data file.
+If <file> contains a relative path, then it is presumed to be
+relative to the directory that the patch script file resides in.
+
+Note that the EGADICT resource has a fixed size of 1024 bytes, so
+only the first 1024 bytes will be read from the given file in order
+to avoid overwriting neighbouring resources in the image.
+
+This command is required in conjunction with %egagraph (section
+3.3.4.4) and %egahead (section 3.3.4.7) in order to be able to load
+replacement graphics into the game.
+
+If an %egadict command does not appear in the patch script, then the
+default EGADICT resource data in the game executable will be used.
+
+Example:
+
+%egadict myegadct.ck4
+
+[3.3.4.11] %ckmhead.obj (Loads MAPHEAD resource data from file)
+
+%ckmhead.obj <file>
+
+This command functions in exactly the same way as %maphead (section
+3.3.4.8), but with the exception that it starts reading from byte
+offset 122 in the file instead.  This is to allow the MAPHEAD
+resource data to be read from the CKxMHEAD.OBJ file that TED5
+generates when it Carmackizes the maps.  See section 4.2 for more
+information on loading maps generated in TED5 into the game.
+
+This command is required in conjunction with %gamemaps (section
+3.3.4.3) in order to load custom levels in Keen 4-6.
+
+Example:
+
+%ckmhead.obj ck4mhead.obj
+
+[3.3.4.12] %tileinfo (Loads TILEINFO resource data from file)
+
+%tileinfo <file>
+
+Loads file <file> into the TILEINFO resource in the executable image.
+The TILEINFO resource contains the properties for all tiles.
+If <file> contains a relative path, then it is presumed to be
+relative to the directory that the patch script file resides in.
+
+If a %tileinfo command does not appear in the patch script, then the
+default TILEINFO resource data in the game executable will be used.
+
+Example:
+
+%tileinfo tiles.tli
+
+[3.3.5] Keen 4 specific commands
+
+These commands are only available with the CK4PATCH.EXE executable.
+
+[3.3.5.1] %level.hint (Princess Lindsey hint messages)
+
+%level.hint <n> [text]
+
+Changes the Princess Lindsey hint messages for Keen 4. <n> can be
+either 5 or 7. The level 5 message can be 73 characters max, the
+level 7 message may be 76 characters max.  If the character limit is
+exceeded, then CKPatch will terminate with an error message.
+
+As with %level.name (section 3.3.4.1) and %level.entry (section
+3.3.4.2), you may find that you'll have to insert carriage returns
+periodically if the message overflows the width of the dialog box
+that it is displayed in.  The font that Keen 4-6 uses is a
+proportional-width font, so you'll have to use trial-and-error in
+order to get the message displaying correctly.  A carriage return
+counts as one character (ASCII 10) towards the character limit.
+
+Example:
+
+%level.hint 5
+Princess Lindsey says
+"Make the most out of CKPatch.
+Read the documentation!"
+
+-----------------------------------------------------------------------
+
+[4] ADVANCED TOPICS
+
+[4.1] How to distribute patches and level packs
+
+For patches that consist of just the patch script file, it's usually
+sufficient to just distribute the patch script file by itself.  You
+can include author and important end-user documentation in the patch
+script comments (see section 3.2.1.1) if you wish.
+
+For patches and level packs that consist of a patch script file plus
+additional data files, it would be a better idea to place the patch
+script file and data files in a subdirectory which is named after
+your level pack or patch, and compress the subdirectory using a
+standard archive format such as ZIP.  The patch file should be named
+PATCH.PAT so the end user can load the level pack or patch simply by
+specifying the directory name.
+
+Note that you should include the subdirectory in the archive, so
+that if the end user extracts the archive straight into their game
+main directory, it will still create the subdirectory and not
+overwrite any of the original game files.
+
+Here is an example of how your distribution archive should be
+organised for distributing a Keen 1-3 level pack:
+
+Archive name: MYKEEN1.ZIP
+
+      / (Root directory of archive)
+      |
+      +--- MYKEEN1 (Level pack subdirectory)
+              |
+              + LEVEL01.CK1 (Level 1 of MYKEEN1 level pack)
+              + LEVEL02.CK1 (Level 2 of MYKEEN1 level pack)
+              + PATCH.PAT (Patch file for MYKEEN1 level pack)
+              + README.TXT (Documentation for MYKEEN1 level pack)
+
+Contents of PATCH.PAT file:
+
+%ext ck1
+%level.file 1 level01.ck1
+%level.file 2 level02.ck1
+%end
+
+To load this level pack, the end user would extract this archive
+into their Keen 1 game directory (which would create the
+subdirectory MYKEEN1 in their game directory), and then run the
+command:
+
+CK1PATCH MYKEEN1
+
+Here is an example of how your distribution archive should be
+organised for distributing a Keen 4-6 level pack:
+
+Archive name: MYKEEN4.ZIP
+
+      / (Root directory of archive)
+      |
+      +--- MYKEEN4 (Level pack subdirectory)
+              |
+              + GAMEMAPS.CK4 (Map data for MYKEEN4 level pack)
+              + MAPHEAD.CK4 (Map header for MYKEEN4 level pack)
+              + PATCH.PAT (Patch file for MYKEEN4 level pack)
+              + README.TXT (Documentation for MYKEEN4 level pack)
+
+Contents of PATCH.PAT file:
+
+%ext ck4
+%gamemaps gamemaps.ck4
+%maphead maphead.ck4
+%end
+
+To load this level pack, the end user would extract this archive
+into their Keen 4 game directory (which would create the
+subdirectory MYKEEN4 in their game directory), and then run the
+command:
+
+CK4PATCH MYKEEN4
+
+You should also provide a URL for obtaining the latest version of
+CKPatch in your level pack or patch documentation, since the end
+user may not have it yet.
+
+Please note that I strongly recommend you do NOT bundle the
+CKxPATCH.EXE executables with your level packs or patches.  The
+reason I request this is because CKPatch is still likely to receive
+bug fixes and updates in the near future.  Distributing outdated
+versions of CKPatch is likely to get users of your level packs or
+patches inadvertently using buggy versions that may break things,
+especially with patches from other authors that require
+newer/bug-fixed versions of CKPatch.
+
+If your patch requires a certain minimum version of CKPatch in order
+to work properly, then you should just mention so in your level pack
+or patch documentation and provide a URL where the end user can
+download the latest version of CKPatch.
+
+An exception to this rule might be if you've actually modified the
+source code to CKPatch and your patch requires your customised
+version.  If this is the case, then you should rename the executable
+to something other than CKxPATCH.EXE so it doesn't get mixed up.
+Remember that since CKPatch is GPL (see section 5.2), you would also
+have to make the source code to your modifications available as
+well.
+
+If you need to make modifications to CKPatch in this manner, it
+would be appreciated if you would notify me (see section 5.4) so I
+can determine if your modifications could be rolled into the
+standard CKPatch distribution.
+
+[4.2] How to load levels created in TED5 into Keen 4-6
+
+From the File menu in TED5, choose "Carmackize Maps".  This will
+compress the maps and generate two files, GAMEMAPS.CKx, which
+contains the compressed map data, and CKxMHEAD.OBJ, which contains
+the indexes of each map in GAMEMAPS.CKx.  TED5 will offer to print a
+report as well on the compression statistics, but you don't need to
+read it.
+
+Although the CKxMHEAD.OBJ file is really an object file that is
+expected to be linked in when compiling the Keen executable, CKPatch
+provides a special command for loading the MAPHEAD resource data
+contained within it by using the %ckmhead.obj command (see section
+3.3.4.11).
+
+To load the levels, create a patch script file and use the following
+commands.  Substitute 4 with the episode number that you are loading
+the levels for.
+
+%ext ck4
+%gamemaps gamemaps.ck4
+%ckmhead.obj ck4mhead.obj
+%end
+
+If you want to distribute your levels created with TED5, then follow
+the distribution example in section 4.1.  The CKxMHEAD.OBJ file
+should be distributed in place of the MAPHEAD.CKx file, with the
+patch script using the %ckmhead.obj command to load it.
+
+-----------------------------------------------------------------------
+
+[5] MISCELLANEOUS
+
+[5.1] Credits
+
+I'd like to thank Steven Fuller and Dan Olson for providing the file
+offsets for the various data resources in the Keen 4/5 executables.
+
+I'd also like to thank Andrew Durdin for providing me with various
+information about the Keen 4-6 executables, as well as providing me
+information about other versions of Keen 1-3 and 6 that I didn't
+have on me.
+
+I'd also like to thank Xtraverse for writing The Patchotron, a Win32
+graphical front-end for CKPatch.  The Patchotron, along with
+tutorials for CKPatch and other various utilities relating to
+Commander Keen can be obtained from Xtraverse's web site at
+http://www.commanderkeen.net/xtra/
+
+Finally, the ASCII-art logo at the start of this document was
+generated by the ASCII Generator page at
+http://www.network-science.de/ascii/
+
+[5.2] Distribution license
+
+CKPatch (and its sources) are released under the GNU General Public
+License, version 2. The file COPYING.TXT contained within this
+distribution archive explains the full terms of the license.
+Briefly, it states that:
+
+- You are free to distribute this program in its unmodified form to
+  anyone you wish at any cost.
+- If you modify this program in any way, you may also distribute it
+  freely and at any cost providing that you state in the
+  documentation what modifications you made to the original copy and
+  that you make the source code to your modifications freely available.
+- You may not deny anyone access to this original unmodified copy or
+  its source code.
+
+I'm in the process of working on a website of my own - when I
+finalise the details I'll place a URL to the source code in this
+document.
+
+[5.3] Disclamer and warranty (or lack thereof)
+
+Put simply, CKPatch comes AS IS with ABSOLUTELY NO WARRANTY,
+expressed or implied.  The author of CKPatch cannot be held liable
+for any consequential damages caused by the use of this program.
+You must use this program at your own risk.
+
+Although I can assure you I never intended to do any of that sort of
+malicious stuff anyway.  If you won't take my word for it, go
+download the source code to CKPatch and see for yourself!  :)
+
+[5.4] Reporting bugs or sending comments
+
+I can be contacted via email at <rodgersb@ses.curtin.edu.au>
+
+Since this software is still in beta stage, it is still possible
+that this software still contains possible bugs that I haven't
+been able to test for yet. If you have bug reports or suggested
+improvements/constructive criticism, feel free to mail me.  If
+mailing a bug report, please be as descriptive as possible, and
+include information such as the following:
+
+- OS version
+- Environment you're trying to run under
+    (Pure DOS/Win9x DOS box etc)
+- Version of Commander Keen.  Include the output from running UNP
+  with the 'i' command on the game executable (see section 3.2.5 for
+  how to obtain UNP via FTP).
+- Any files related to the problem
+- A description of what you were trying to do
+
+I look forward to feedback from all of you.  I will try my best to
+reply to your emails as soon as possible.
+
+-----------------------------------------------------------------------
+
+*** END OF CKPATCH.TXT ***
