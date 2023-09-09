@@ -1,0 +1,16 @@
+BC30/*
+
+KEEN4-6/static/*.CK4
+KEEN4-6/static/KEEN*.EXE
+KEEN4-6/KEEN4/OBJ/*
+
+# Borland C++ config file of some sort
+TCCONFIG.TC
+# Borland C++ file backup
+*.BAK
+# Borland C++ Desktop layout file, that contains all open files, their positions etc.
+*.DSK
+# Borland C++ precompiled header file
+*.SYM
+# Borland C++ swap file
+*.SWP
