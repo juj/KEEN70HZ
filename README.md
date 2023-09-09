@@ -1,4 +1,6 @@
-# Commander Keen 4 70 fps
+<img src='./DIST/intro.png' style='image-rendering: pixelated;'>
+
+# Introduction
 
 If you stumbled on to this repository, you are probably a PC vintage gaming nostalgist like me.
 
@@ -6,16 +8,18 @@ If so, here is a PC gaming history quiz question:
 
 *What was the first ever DOS game, that*
 ```
-a) ran at a VGA 320x200 resolution, so 70Hz. (i.e. not Mode-X which was only 60hz), and
-b) implemented hardware-based EGA/VGA scrolling (i.e. relied on the IBM graphics adapter's hardware feature instead of doing full screen repaints)
-c) was programmed with the skill and sophistication needed that the game actually reached 70Hz on hardware of the era, without dropping frames, missing vsyncs or needing to run with frame decimation?
+a) ran at a VGA 320x200 resolution, so 70 Hz. (i.e. not Mode-X which was "only" 60hz), and
+b) implemented hardware-based EGA/VGA scrolling (i.e. relied on the IBM graphics adapter's
+   hardware feature instead of doing full screen repaints)
+c) was programmed with the skill and sophistication needed that the game actually reached 70 fps
+   on hardware of the era, without decimating or skipping frames or missing vsyncs?
 ```
 
 Before I ventured on to this retro programming journey, my memory would have rather quickly answered: "Commander Keen 4, in 1991". But turns out that is not the case.
 
-The original Keen 4-6 trilogy did pass on counts a)-b), but it was actually limited to run only at half speed, 35 fps (yeah, that "cinematic 30fps" approach has long roots), and additionally, id Software did not manage to program the game logic to be locked to vsync. To top it all off, their implementation of hardware scrolling synchronization was a bit hacky, which caused hardware incompatibilities, and was later attempted to be fixed more than once by layering more hacks on top. Classic game developers, right?
+The original Keen 4-6 trilogy did pass on counts a)-b), but it was actually limited to run only at half speed, 35 fps (yeah, that "cinematic 30fps" approach has long roots), and additionally, id Software did not manage to program the game logic to be locked to vsync. To top it all off, their implementation of hardware scrolling synchronization was a bit hacky, first suffering from performance problems, and then later caused hardware incompatibilities on newer PCs with faster ISA buses and PCI graphics cards released the next year in 1992. The synchronization code was attempted to be fixed more than once by layering more hacks on top. Classic game developers, right? ;)
 
-Was the first smooth 70 Hz scrolling game then maybe Jazz Jackrabbit in 1994? Well, it passes b) and c), but it ran at 60 Hz and not at 70 Hz, i.e. -14.3% fewer fps! 60 Hz ain't no good in DOS town ;)
+Was the first smooth 70 Hz scrolling game then maybe Jazz Jackrabbit in 1994? Well, it passes b) and c), but it ran at 60 Hz and not at 70 Hz, i.e. -14.3% fewer fps!
 
 Maybe it was One Must Fall 2097? It was also 1994, and was butter smooth at 70 Hz, so a check on a) and c). But OMF was no platformer, hence did not need to scroll.
 
@@ -23,14 +27,18 @@ Shockingly, I realize I have no clue who would have been the first, so I posed t
 
 But, in either case, now you finally *can* play Keen 4-6 smoothly at 70 Hz! Even on your old PC from the era.
 
-This mod is a technology demo to showcase that with some careful fixes/refactoring to their synchronization code, it would have been possible for Carmack and Romero to ship Keen running at 70 hz already in 1991, without microstuttering or missed frames.
+# Commander Keen 4 70 fps
+
+This mod is a technology demo to showcase that with some careful fixes/refactoring to their synchronization code, it would have been possible for Carmack and Romero to ship Keen running at 70 fps already in 1991, without microstuttering or missed frames, while retaining the performance compatibility for slow 286 PCs.
+
+<img src='./DIST/keen4_70hz.png'>
 
 This repository changes:
 - Fixes id Software's original code that failed to robustly synchronize to the VGA adapter's vblank.
 - Removes the "Fix Jerky Motion" hack as redundant, since the code now properly calibrates itself to
   distinguish hblanks from vblanks.
 - Refactors the game update logic to be locked tight to the 70 Hz update rate of the VGA adapter.
-  This helps the game not miss vsyncs for much smoother gameplay at both 35 Hz or 70Hz rates.
+  This helps the game not miss vsyncs for much smoother gameplay at both 35 Hz or 70 Hz rates.
   On 60 Hz EGA adapters, the game will run decoupled as it used to.
 - Adds a new Option menu setting, `"Full Frame Rate"` which, if enabled, updates the game to render
   at 70 Hz instead of the original frame-skipping 35 Hz. Note that when this option is enabled,
@@ -47,7 +55,7 @@ This repository changes:
 
 Tested to work smoothly on a 80 MHz 486 PC, that is slowed down to 25 MHz via the PC's Turbo button.
 
-Had id Software pulled 70 Hz off in 1991, it would certainly have given the owners of fast 386/486 PCs something to proudly showcase!
+Had id Software pulled 70 Hz off in 1991, it would certainly have given the owners of fast 386/486 PCs also something **nonviolent** to proudly showcase!
 
 ## Running a precompiled version
 
