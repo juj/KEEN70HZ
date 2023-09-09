@@ -9,6 +9,8 @@ makeobj c CGADICT.CK4  ..\keen4\ck4cdict.obj _CGAdict
 makeobj f CGAHEAD.CK4  ..\keen4\ck4chead.obj CGA_grafixheader _CGAhead
 makeobj f MAPHEAD.CK4  ..\keen4\ck4mhead.obj MapHeader _maphead
 makeobj f introscn.CK4 ..\keen4\ck4intro.obj _introscn
+mkdir ..\keen4\obj > NUL
+copy ..\..\k4e-14\*.ck4 ..\keen4\obj
 
 makeobj c AUDIODCT.CK5 ..\keen5\ck5adict.obj _audiodict
 makeobj f AUDIOHED.CK5 ..\keen5\ck5ahead.obj _AudioHeader _audiohead
