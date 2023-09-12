@@ -44,6 +44,10 @@ This repository changes:
   at 70 Hz instead of the original frame-skipping 35 Hz. Note that when this option is enabled,
   some of the original game logic is impacted, as the game logic does not expect to run at 70 Hz.
   (Keen sometimes misses grabbing ledges, and can get stuck on bouncing red balls in the 1st level)
+  Note that to run `Full Frame Rate` anywhere near smoothly in DOSBox-X, a ≥70 Hz display is needed.
+  Since 70 Hz displays do not exist on the modern PC market, best results come with a display that
+  has as high refresh rate as possible, so that microstuttering is minimized. ASUS PG259QN or
+  similar gaming display with overly fast 360 Hz refresh rate will yield ideal results.
 - Adds a new Option menu setting, `"1 Pixel Panning"` which, if enabled, updates the game hardware
   scrolling to occur at 1 pixel granularity, instead of the old 2 pixel granularity. This improves
   the smoothness of horizontal panning backgrounds.
@@ -59,7 +63,7 @@ Had id Software pulled 70 Hz off in 1991, it would certainly have given the owne
 
 ## Running a precompiled version
 
-Get the file [DIST/KEEN70HZ.ZIP](DIST/KEEN70HZ.ZIP), deploy it to DOSBox or your vintage PC, and run KEEN70HZ.EXE. The original Keen 4 v1.4 shareware version files are included, so you can also run KEEN4E.EXE to see how it was originally.
+Get the file [DIST/KEEN70HZ.ZIP](DIST/KEEN70HZ.ZIP), deploy it to DOSBox-X or your vintage PC, and run KEEN70HZ.EXE. The original Keen 4 v1.4 shareware version files are included, so you can also run KEEN4E.EXE to see how it was originally.
 
 Note however that the CONFIG.CK4 files are not compatible, so you will need to reconfigure the settings when changing between executables.
 
