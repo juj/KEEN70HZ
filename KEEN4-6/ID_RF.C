@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 // ID_RF.C
 
@@ -1556,7 +1557,7 @@ void RF_CalcTics (void)
 // calculate tics since last refresh for adaptive timing
 //
 	if (lasttimecount > TimeCount)
-		SDL_ResetTimeCount(lasttimecount);		// if the game was paused a LONG time
+		Juj_ResetTimeCount(lasttimecount);		// if the game was paused a LONG time
 
 	if (DemoMode)					// demo recording and playback needs
 	{								// to be constant
@@ -1567,7 +1568,7 @@ void RF_CalcTics (void)
 		newtime = oldtimecount+DEMOTICS*2 - TimeCount;
 		if (newtime > 0) VW_WaitVBL(newtime);
 		lasttimecount = oldtimecount + DEMOTICS;
-		SDL_ResetTimeCount(lasttimecount + DEMOTICS);
+		Juj_ResetTimeCount(lasttimecount + DEMOTICS);
 		tics = DEMOTICS;
 	}
 	else
@@ -1596,7 +1597,7 @@ void RF_CalcTics (void)
 		if (tics>MAXTICS)
 		{
 			lasttimecount -= (tics-MAXTICS);
-			SDL_ResetTimeCount(lasttimecount);
+			Juj_ResetTimeCount(lasttimecount);
 			tics = MAXTICS;
 		}
 	}
@@ -2323,7 +2324,7 @@ void RF_Refresh (void)
 // a camera reset. So this change needs to occur delayed to be smoothly
 // synchronized to vertical refresh.
 //
-	VW_SetScreenDelayed(bufferofs+panadjust,panx & xpanmask);
+	Juj_SetScreenDelayed(bufferofs+panadjust,panx & xpanmask);
 
 //
 // prepare for next refresh

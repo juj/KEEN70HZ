@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 // ID_VW.H
 
@@ -260,7 +261,7 @@ cardtype	VW_VideoID (void);
 void 	VW_SetLineWidth(int width);
 void 	VW_SetSplitScreen(int width);
 void 	VW_SetScreen (unsigned CRTC, unsigned pelpan);
-void 	VW_SetScreenDelayed (unsigned CRTC, unsigned pelpan);
+void 	Juj_SetScreenDelayed (unsigned CRTC, unsigned pelpan);
 
 void	VW_SetScreenMode (int grmode);
 void	VW_ClearVideo (int color);

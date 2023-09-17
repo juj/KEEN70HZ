@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 //
 //	ID Engine
@@ -757,7 +758,7 @@ boolean SupportsCrtTerminator = 0;
 static unsigned char PrevFrame = 0;
 static long PreciseTimeCount = 0; // Only used if locked at 70 Hz
 
-void SDL_UpdateTime()
+void Juj_UpdateTime()
 {
 	if (VideoRefreshRateIs70Hz && SupportsCrtTerminator)
 	{
@@ -776,7 +777,7 @@ void SDL_UpdateTime()
 }
 
 // Must be called with interrupts disabled
-void SDL_AlignPreciseTimeCount()
+void Juj_AlignPreciseTimeCount()
 {
 	if (VideoRefreshRateIs70Hz) // If refresh rate is 60 Hz, can't lock to vsync
 	{
@@ -786,7 +787,7 @@ void SDL_AlignPreciseTimeCount()
 	}
 }
 
-void SDL_ResetTimeCount(long newTimeCount)
+void Juj_ResetTimeCount(long newTimeCount)
 {
 	disable();
 	TimeCount = newTimeCount;
@@ -811,7 +812,7 @@ asm	out	dx,al
 
 	HackCount++;
 
-	SDL_UpdateTime();
+	Juj_UpdateTime();
 
 	if (MusicMode == smm_AdLib)
 	{
@@ -925,7 +926,7 @@ SDL_StartDevice(void)
 }
 
 void
-SDL_SetTimerSpeed(void)
+Juj_SetTimerSpeed(void)
 {
 	word	rate;
 
@@ -987,7 +988,7 @@ SD_SetSoundMode(SDMode mode)
 		SDL_StartDevice();
 	}
 
-	SDL_SetTimerSpeed();
+	Juj_SetTimerSpeed();
 
 	return(result);
 }
@@ -1027,7 +1028,7 @@ SD_SetMusicMode(SMMode mode)
 	if (result)
 		MusicMode = mode;
 
-	SDL_SetTimerSpeed();
+	Juj_SetTimerSpeed();
 
 	return(result);
 }

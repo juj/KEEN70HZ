@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 // ID_VW.C
 
@@ -106,12 +107,12 @@ unsigned	cursorspot;
 static	char *ParmStrings[] = {"HIDDENCARD","NOPAN",""};
 
 // JukkaJ: VW_ApplyScreenScroll() programs the CRTC scroll registers with
-//         previously set scroll values from VW_SetScreenDelayed(). Caller must
+//         previously set scroll values from Juj_SetScreenDelayed(). Caller must
 //         ensure when calling this function that we are currently synchronized
 //         to vertical blank and that interrupts are disabled.
 static unsigned int pending_crtc;
 static unsigned char pending_pel;
-static void ApplyScreenScroll()
+static void Juj_ApplyScreenScroll()
 {
 //asm cli // Caller needs to ensure interrupts are disabled!
 	asm mov dx, 3D4h
@@ -135,7 +136,7 @@ static void ApplyScreenScroll()
 // JukkaJ: This function marks the new display scroll parameters that should be
 //         applied the next time when synchronizing to vertical blank. Use this
 //         function when scrolling needs to be smooth.
-void VW_SetScreenDelayed(unsigned int crtc, unsigned int pel)
+void Juj_SetScreenDelayed(unsigned int crtc, unsigned int pel)
 {
 	pending_crtc = crtc;
 	pending_pel = pel;
@@ -146,13 +147,13 @@ void VW_SetScreenDelayed(unsigned int crtc, unsigned int pel)
 //         exiting game menus.
 void VW_SetScreen(unsigned int crtc, unsigned int pel)
 {
-	VW_SetScreenDelayed(crtc, pel);
+	Juj_SetScreenDelayed(crtc, pel);
 	disable();
-	ApplyScreenScroll();
+	Juj_ApplyScreenScroll();
 	enable();
 }
 
-static void WaitVBLCrtTerminator(int number)
+static void Juj_WaitVBLCrtTerminator(int number)
 {
 	if (number > 1) // If more than one blank to wait, we can leisurely skip
 	{               // through the extras without needing to disable interrupts.
@@ -182,13 +183,13 @@ wait_until_vblank_start:
 	asm jz wait_until_vblank_start // Loop until frame changes (vblank is entered)
 	// Now we are at start of vblank, this is the perfect moment to reprogram
 	// both VGA hardware scroll registers.
-	ApplyScreenScroll();
-	SDL_UpdateTime(); // And also ensure we have latest game time
+	Juj_ApplyScreenScroll();
+	Juj_UpdateTime(); // And also ensure we have latest game time
 	asm sti
 
 }
 
-static void WaitVBLVGA(int number)
+static void Juj_WaitVBLVGA(int number)
 {
 	int i;
 	while(number-- > 0)
@@ -212,8 +213,8 @@ wait_for_hblank:
 
 		// If we get here, we have transitioned from visible image to a blank that is at least 15 VGA I/O port
 		// read operations long. We conclude we must have now entered a vblank.
-		ApplyScreenScroll();
-		SDL_AlignPreciseTimeCount();
+		Juj_ApplyScreenScroll();
+		Juj_AlignPreciseTimeCount();
 		enable();
 	}
 }
@@ -222,8 +223,8 @@ wait_for_hblank:
 //         reprograms the hardware scroll registers in a synchronized manner.
 void VW_WaitVBL(int number)
 {
-	if (SupportsCrtTerminator) WaitVBLCrtTerminator(number);
-	else WaitVBLVGA(number);
+	if (SupportsCrtTerminator) Juj_WaitVBLCrtTerminator(number);
+	else Juj_WaitVBLVGA(number);
 }
 
 void	VW_Startup (void)

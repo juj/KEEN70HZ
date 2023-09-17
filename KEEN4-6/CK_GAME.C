@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 #include "CK_DEF.H"
 
@@ -420,7 +421,7 @@ void FadeAndUnhook(void)
 	{
 		VW_FadeIn();
 		RF_SetRefreshHook(NULL);
-		SDL_ResetTimeCount(lasttimecount);	// don't adaptively time the fade
+		Juj_ResetTimeCount(lasttimecount);	// don't adaptively time the fade
 	}
 }
 

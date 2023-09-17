@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 #include "CK_DEF.H"
 
@@ -2197,7 +2198,7 @@ void PlayLoop(void)
 	{
 		US_InitRndT(true);
 	}
-	SDL_ResetTimeCount(3);
+	Juj_ResetTimeCount(3);
 	lasttimecount = tics = 3;
 
 	do

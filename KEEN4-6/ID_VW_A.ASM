@@ -15,6 +15,8 @@
 ; with this program; if not, write to the Free Software Foundation, Inc.,
 ; 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+; Modified JukkaJ Sep 09 2023
+
 ; ID_VW_A.ASM
 
 IDEAL

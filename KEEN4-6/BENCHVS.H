@@ -1,5 +1,5 @@
-// BENCHVS.H: JukkaJ: Benchmark the vertical refresh rate and hblank
-//                    length.
+// BENCHVS.H: JukkaJ Sep 09 2023: Benchmark the vertical refresh rate
+//                                and hblank length.
 
 #ifndef BENCHVS_H
 #define BENCHVS_H

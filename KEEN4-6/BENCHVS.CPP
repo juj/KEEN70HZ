@@ -1,5 +1,5 @@
-// BENCHVS.CPP: JukkaJ: Benchmark the vertical refresh rate and hblank
-//                      length.
+// BENCHVS.H: JukkaJ Sep 09 2023: Benchmark the vertical refresh rate
+//                                and hblank length.
 
 #include <dos.h>
 #include "benchvs.h"

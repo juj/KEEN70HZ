@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 #include "CK_DEF.H"
 
@@ -527,7 +528,7 @@ nextline:
 		// page flip and handle timing
 		// This needs to scroll smoothly, so use delayed SetScreen.
 		//
-		VW_SetScreenDelayed(pageofs + x / 8, x & 7);
+		Juj_SetScreenDelayed(pageofs + x / 8, x & 7);
 		VW_WaitVBL(1);
 		now = TimeCount;
 		tics = now-lasttimecount;
@@ -1800,7 +1801,7 @@ void ScrollSWText(void)
 	Sint16 i, rowof;
 
 	tics = lasttimecount = 0;
-	SDL_ResetTimeCount(0);
+	Juj_ResetTimeCount(0);
 
 	EGAWRITEMODE(0);
 	EGAMAPMASK(8);	// only draw to the "intensity" plane (so we don't erase the backgound pic)

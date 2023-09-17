@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 //
 //	ID Engine
@@ -188,7 +189,7 @@ extern boolean SupportsCrtTerminator;
 // Function prototypes
 extern	void	SD_Startup(void),
 				SD_Shutdown(void),
-				SDL_UpdateTime(void),
+				Juj_UpdateTime(void),
 				SD_Default(boolean gotit,SDMode sd,SMMode sm),
 				SD_PlaySound(soundnames sound),
 				SD_StopSound(void),

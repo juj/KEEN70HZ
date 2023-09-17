@@ -19,6 +19,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// Modified JukkaJ Sep 09 2023
 
 //
 //      ID Engine
@@ -183,7 +184,7 @@ static  boolean USL_ConfigCustom(UserCall call,struct UserItem far *item),
 				USL_ScoreCustom(UserCall call,struct UserItem far *item),
 				USL_CompCustom(UserCall call,struct UserItem far *item),
 				USL_SmoothCustom(UserCall call,struct UserItem far *item),
-				USL_Pan1PxCustom(UserCall call,struct UserItem far *item),
+				Juj_Pan1PxCustom(UserCall call,struct UserItem far *item),
 #ifdef KEEN
 				USL_TwoCustom(UserCall call,struct UserItem far *item),
 #endif
@@ -260,7 +261,7 @@ static  boolean USL_ConfigCustom(UserCall call,struct UserItem far *item),
 #endif
 	UserItemGroup   far smoothgroup = {0,0,0,sc_None,0,USL_SmoothCustom};
 #if GRMODE != CGAGR
-	UserItemGroup   far pan1pxgroup = {0,0,0,sc_None,0,USL_Pan1PxCustom};
+	UserItemGroup   far pan1pxgroup = {0,0,0,sc_None,0,Juj_Pan1PxCustom};
 	UserItemGroup   far compgroup = {0,0,0,sc_None,0,USL_CompCustom};
 #endif
 
@@ -782,7 +783,7 @@ extern unsigned	xpanmask;
 
 #pragma argsused
 static boolean
-USL_Pan1PxCustom(UserCall call,UserItem far *item)
+Juj_Pan1PxCustom(UserCall call,UserItem far *item)
 {
 	if (call != uic_SetupCard)
 		return(false);
