@@ -157,8 +157,8 @@ static void Juj_WaitVBLCrtTerminator(int number)
 {
 	if (number > 1) // If more than one blank to wait, we can leisurely skip
 	{               // through the extras without needing to disable interrupts.
-		unsigned char fc = inp(0x126) - 1;
-		while((unsigned char)(inp(0x126) - fc) < number) ;
+		unsigned char fc = inportb(0x126) - 1;
+		while((unsigned char)(inportb(0x126) - fc) < number) ;
 	}
 	// Only one blank to wait left.
 	asm mov dx, 127h // Port 127h: CRT Terminator "Scanlines left until vblank"
@@ -197,7 +197,7 @@ static void Juj_WaitVBLVGA(int number)
 		long time_start = TimeCount;
 		disable();
 wait_for_active_picture:
-		while (inp(0x3DA) & 1) /*nop*/;  // Skip blank regions, i.e. wait until we are in visible picture area
+		while (inportb(0x3DA) & 1) /*nop*/;  // Skip blank regions, i.e. wait until we are in visible picture area
 
 wait_for_hblank:
 		enable(); // Let interrupts run so that TimeCount advances.

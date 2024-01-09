@@ -140,7 +140,7 @@ SDL_SetTimer0(word speed)
 #ifndef TPROF	// If using Borland's profiling, don't screw with the timer
 	outportb(0x43,0x36);				// Change timer 0
 	outportb(0x40,speed);
-	outportb(0x40,speed >> 8);
+	outportb(0x40,(speed >> 8));
 	TimerDivisor = speed;
 #else
 	TimerDivisor = 0x10000;
@@ -762,7 +762,7 @@ void Juj_UpdateTime()
 {
 	if (VideoRefreshRateIs70Hz && SupportsCrtTerminator)
 	{
-		unsigned char frame = inp(0x126), delta = frame - PrevFrame;
+		unsigned char frame = inportb(0x126), delta = frame - PrevFrame;
 		LocalTime += delta;
 		TimeCount += delta;
 		PrevFrame = frame;
@@ -1042,13 +1042,13 @@ static void DetectCrtTerminator()
 	// values 'C', 'R', 'T', 'T' on subsequent reads.
 	for(i = 0; i < 4; ++i) // one of 4 consecutive reads must be a 'C'
 	{
-		int x = inp(0x120);
+		int x = inportb(0x120);
 		if (x == 'C') break;
 		if (x != 'R' && x != 'T') SupportsCrtTerminator = 0; // Got anything else? Can't be CRTT
 	}
-	if (inp(0x120) != 'R') SupportsCrtTerminator = 0;
-	if (inp(0x120) != 'T') SupportsCrtTerminator = 0;
-	if (inp(0x120) != 'T') SupportsCrtTerminator = 0;
+	if (inportb(0x120) != 'R') SupportsCrtTerminator = 0;
+	if (inportb(0x120) != 'T') SupportsCrtTerminator = 0;
+	if (inportb(0x120) != 'T') SupportsCrtTerminator = 0;
 	enable();
 }
 

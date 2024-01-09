@@ -22,14 +22,14 @@ static void SetTimerIntr(INTERRUPT_PROC handler, int interval)
   // Set new timer resolution for PIT #0 (DOS default timer is 18.2065hz)
   // Mode register: 00b: Select channel 0, 11b: Access lo+hi bytes,
   //                011b: Square wave, 0b: 16-bit binary mode
-  outp(0x43, 0x36); // 0x36=00110110b
-  outp(0x40, interval);
-  outp(0x40, interval >> 8);
+  outportb(0x43, 0x36); // 0x36=00110110b
+  outportb(0x40, interval);
+  outportb(0x40, (interval >> 8));
   enable();
 }
 
 static volatile long TimeMsecs = 0;
-static void interrupt far TimerHandler() { ++TimeMsecs; outp(0x20, 0x20); }
+static void interrupt far TimerHandler() { ++TimeMsecs; outportb(0x20, 0x20); }
 
 extern "C" void SDL_SetTimerSpeed(void);
 
@@ -76,9 +76,14 @@ extern "C" void BenchmarkVideoRefreshRate()
   SetTimerIntr(TimerHandler, 298); // 1193182/298 = 4000 times/second
   enable();
   // Measure duration of 10 vblanks
-  while(inp(0x3DA)&8); while(!(inp(0x3DA)&8));
+  while(  inportb(0x3DA)&8);
+  while(!(inportb(0x3DA)&8));
   t = TimeMsecs;
-  for(i = 0; i < 10; ++i) { while(inp(0x3DA)&8); while(!(inp(0x3DA)&8)); }
+  for(i = 0; i < 10; ++i)
+  {
+    while(  inportb(0x3DA)&8);
+    while(!(inportb(0x3DA)&8));
+  }
   t = TimeMsecs + 1 - t;
   // Uninstall msec-granular timer
   SetTimerIntr(prevTimerProc, 0);
