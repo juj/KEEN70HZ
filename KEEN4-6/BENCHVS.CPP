@@ -31,7 +31,7 @@ static void SetTimerIntr(INTERRUPT_PROC handler, int interval)
 static volatile long TimeMsecs = 0;
 static void interrupt far TimerHandler() { ++TimeMsecs; outportb(0x20, 0x20); }
 
-extern "C" void SDL_SetTimerSpeed(void);
+extern "C" void Juj_SetTimerSpeed(void);
 
 static void CalibrateMaxHblankLength()
 {
@@ -87,7 +87,7 @@ extern "C" void BenchmarkVideoRefreshRate()
   t = TimeMsecs + 1 - t;
   // Uninstall msec-granular timer
   SetTimerIntr(prevTimerProc, 0);
-  SDL_SetTimerSpeed(); // Restore previous timer speed since we overwrote it above
+  Juj_SetTimerSpeed(); // Restore previous timer speed since we overwrote it above
   VideoRefreshRate = (40000l+(t>>1))/t;
   VideoRefreshRateIs70Hz = (VideoRefreshRate >= 67 && VideoRefreshRate <= 73);
 
